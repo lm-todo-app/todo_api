@@ -6,16 +6,15 @@ from models.user import UserSchema
 from models.db import db
 
 class User(Resource):
-    def __init__(self):
-        self.user_schema = UserSchema()
-
     def get(self, user_id):
         user = UserModel.query.get(user_id)
-        return self.user_schema.dump(user), 200
+        user_schema = UserSchema(exclude=['password'])
+        return user_schema.dump(user), 200
 
     def put(self, user_id):
         req = request.get_json()
-        errors = self.user_schema.validate(req)
+        user_schema = UserSchema()
+        errors = user_schema.validate(req)
         if errors:
             return 500
 
@@ -42,16 +41,15 @@ class User(Resource):
 
 
 class Users(Resource):
-    def __init__(self):
-        self.user_schema = UserSchema()
-
     def get(self):
         users = UserModel.query.all()
-        return self.user_schema.dump(users, many=True), 200
+        user_schema = UserSchema(exclude=['password'])
+        return user_schema.dump(users, many=True), 200
 
     def post(self):
         req = request.get_json()
-        errors = self.user_schema.validate(req)
+        user_schema = UserSchema()
+        errors = user_schema.validate(req)
         if errors:
             return 500
 
