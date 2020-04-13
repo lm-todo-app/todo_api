@@ -1,5 +1,6 @@
 from flask import request
 from flask_restful import Resource
+from werkzeug.security import generate_password_hash, check_password_hash
 from models.user import User as UserModel
 from models.user import UserSchema
 from models.db import db
@@ -54,10 +55,12 @@ class Users(Resource):
         if errors:
             return 500
 
+        password_hash = generate_password_hash(req['password'])
+
         user = UserModel(
             username=req['username'],
             email=req['email'],
-            password=req['password'],
+            password=password_hash,
         )
         db.session.add(user)
 

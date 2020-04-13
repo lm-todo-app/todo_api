@@ -11,6 +11,8 @@ flask = "*"
 flask-sqlalchemy = "*"
 flask-restful = "*"
 flask-marshmallow = "*"
+flask-login = "*"
+marshmallow-sqlalchemy = "*"
 
 [requires]
 python_version = "3.8"
