@@ -1,16 +1,18 @@
 from flask import request
 from flask_restful import Resource
-from werkzeug.security import generate_password_hash, check_password_hash
+from flask_jwt_extended import create_access_token, jwt_required
 from models.user import User as UserModel
 from models.user import UserSchema
 from models.db import db
 
 class User(Resource):
+    @jwt_required
     def get(self, user_id):
         user = UserModel.query.get(user_id)
         user_schema = UserSchema(exclude=['password'])
         return user_schema.dump(user), 200
 
+    @jwt_required
     def put(self, user_id):
         req = request.get_json()
         user_schema = UserSchema()
@@ -19,9 +21,11 @@ class User(Resource):
             return 500
 
         user = UserModel.query.get(user_id)
+
+        # TODO: if the following exist in the form:
         user.username = req['username']
         user.email = req['email']
-        user.password = req['password']
+        user.set_password(req['password'])
 
         try:
             db.session.commit()
@@ -29,10 +33,10 @@ class User(Resource):
             return {'msg': 'Error updating'}, 500
         return 200
 
+    @jwt_required
     def delete(self, user_id):
         user = UserModel.query.get(user_id)
         db.session.delete(user)
-
         try:
             db.session.commit()
         except:
@@ -41,6 +45,7 @@ class User(Resource):
 
 
 class Users(Resource):
+    @jwt_required
     def get(self):
         users = UserModel.query.all()
         user_schema = UserSchema(exclude=['password'])
@@ -50,20 +55,20 @@ class Users(Resource):
         req = request.get_json()
         user_schema = UserSchema()
         errors = user_schema.validate(req)
-        if errors:
+        user_exists = UserModel.query.filter_by(email=req['email']).first()
+        if errors or user_exists:
             return 500
-
-        password_hash = generate_password_hash(req['password'])
-
         user = UserModel(
             username=req['username'],
             email=req['email'],
-            password=password_hash,
         )
+        user.set_password(req['password'])
         db.session.add(user)
-
         try:
             db.session.commit()
         except:
             return {'msg': 'Error saving'}, 500
-        return 200
+            access_token = create_access_token(identity=user.email)
+            user_schema = UserSchema(exclude=['password'])
+            user_json = user_schema.dump(user)
+            return {'user': user_json, 'access_token': access_token}, 200
