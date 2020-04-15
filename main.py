@@ -1,11 +1,13 @@
 from flask import Flask
 from flask_restful import Api
+from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from models.db import db, ma
 from resources.user import Users, User
 from resources.auth import Auth
 
 app = Flask(__name__)
+CORS(app)
 api = Api(app)
 jwt = JWTManager(app)
 
