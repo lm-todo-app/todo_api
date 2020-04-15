@@ -10,7 +10,7 @@ class Auth(Resource):
         user_schema = UserSchema()
         errors = user_schema.validate(req)
         if errors:
-            return 500
+            return {'msg': 'errors'}, 500
         user = UserModel.query.filter_by(email=req['email']).first()
         if user and user.check_password(req['password']):
             access_token = create_access_token(identity=req['email'])

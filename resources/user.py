@@ -59,7 +59,7 @@ class Users(Resource):
         errors = user_schema.validate(req)
         user_exists = UserModel.query.filter_by(email=req['email']).first()
         if errors or user_exists:
-            return 500
+            return {'msg': 'errors'}, 500
         user = UserModel(
             username=req['username'],
             email=req['email'],
@@ -70,7 +70,7 @@ class Users(Resource):
             db.session.commit()
         except:
             return {'msg': 'Error saving'}, 500
-            access_token = create_access_token(identity=user.email)
-            user_schema = UserSchema(exclude=['password'])
-            user_json = user_schema.dump(user)
-            return {'user': user_json, 'access_token': access_token}, 200
+        access_token = create_access_token(identity=user.email)
+        user_schema = UserSchema(exclude=['password'])
+        user_json = user_schema.dump(user)
+        return {'user': user_json, 'access_token': access_token}, 200
