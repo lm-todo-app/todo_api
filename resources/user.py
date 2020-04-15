@@ -22,10 +22,12 @@ class User(Resource):
 
         user = UserModel.query.get(user_id)
 
-        # TODO: if the following exist in the form:
-        user.username = req['username']
-        user.email = req['email']
-        user.set_password(req['password'])
+        if req['username']:
+            user.username = req['username']
+        if req['email']:
+            user.email = req['email']
+        if req['password']:
+            user.set_password(req['password'])
 
         try:
             db.session.commit()
