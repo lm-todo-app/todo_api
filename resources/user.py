@@ -3,7 +3,7 @@ from flask_restful import Resource
 from flask_jwt_extended import create_access_token, jwt_required
 from models.user import User as UserModel
 from models.user import UserSchema
-from models.db import db
+from database import db
 
 class User(Resource):
     @jwt_required

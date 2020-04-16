@@ -24,3 +24,13 @@ else run:
 
 `pipenv shell`
 
+---
+
+Flask Migrate
+
+After creating or editing a model:
+
+- run `flask db migrate -m "NAME OF MIGRATION"`
+- run `flask db upgrade`
+
+_Note: Flask migrations need to be reviewed as they are not always correct._
