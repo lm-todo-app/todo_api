@@ -1,3 +1,4 @@
+from settings import SECRET, JWT_SECRET, DEV_DB_URI
 from flask import Flask
 from flask_restful import Api
 from flask_cors import CORS
@@ -11,10 +12,10 @@ CORS(app)
 api = Api(app)
 jwt = JWTManager(app)
 
-app.config['SECRET_KEY'] = 'secret'
-app.config['JWT_SECRET_KEY'] = 'super-secret'
+app.config['SECRET_KEY'] = SECRET
+app.config['JWT_SECRET_KEY'] = JWT_SECRET
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/test.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = DEV_DB_URI
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 with app.app_context():
