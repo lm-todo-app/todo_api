@@ -17,4 +17,4 @@ class Auth(Resource):
             user_schema = UserSchema(exclude=['password'])
             user_json = user_schema.dump(user)
             return {'user': user_json, 'access_token': access_token}, 200
-        return {'msg': 'incorrect email address or password'}, 401
+        return {'msg': 'Incorrect email address or password'}, 401

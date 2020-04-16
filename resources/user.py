@@ -18,7 +18,7 @@ class User(Resource):
         user_schema = UserSchema()
         errors = user_schema.validate(req)
         if errors:
-            return 500
+            return {'msg': 'Error validating form'}, 500
 
         user = UserModel.query.get(user_id)
 
@@ -32,7 +32,7 @@ class User(Resource):
         try:
             db.session.commit()
         except:
-            return {'msg': 'Error updating'}, 500
+            return {'msg': 'Error updating user'}, 500
         return 200
 
     @jwt_required
@@ -42,7 +42,7 @@ class User(Resource):
         try:
             db.session.commit()
         except:
-            return {'msg': 'Error deleting'}, 500
+            return {'msg': 'Error deleting user'}, 500
         return 200
 
 
@@ -58,8 +58,10 @@ class Users(Resource):
         user_schema = UserSchema()
         errors = user_schema.validate(req)
         user_exists = UserModel.query.filter_by(email=req['email']).first()
-        if errors or user_exists:
-            return {'msg': 'errors'}, 500
+        if user_exists:
+            return {'msg': 'User already exists with that email address'}, 500
+        if errors:
+            return {'msg': 'Error validating form'}, 500
         user = UserModel(
             username=req['username'],
             email=req['email'],
@@ -69,7 +71,7 @@ class Users(Resource):
         try:
             db.session.commit()
         except:
-            return {'msg': 'Error saving'}, 500
+            return {'msg': 'Error creating user'}, 500
         access_token = create_access_token(identity=user.email)
         user_schema = UserSchema(exclude=['password'])
         user_json = user_schema.dump(user)
