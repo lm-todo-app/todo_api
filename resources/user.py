@@ -4,6 +4,9 @@ from flask_jwt_extended import create_access_token, jwt_required
 from models.user import User as UserModel
 from models.user import UserSchema
 from database import db
+from common.message import (error_validating_form,
+                            crud_error,
+                            user_exists_message)
 
 class User(Resource):
     @jwt_required
@@ -18,7 +21,7 @@ class User(Resource):
         user_schema = UserSchema()
         errors = user_schema.validate(req)
         if errors:
-            return {'msg': 'Error validating form'}, 500
+            return error_validating_form, 500
 
         user = UserModel.query.get(user_id)
 
@@ -32,7 +35,7 @@ class User(Resource):
         try:
             db.session.commit()
         except:
-            return {'msg': 'Error updating user'}, 500
+            return crud_error('updating', 'user'), 500
         return 200
 
     @jwt_required
@@ -42,7 +45,7 @@ class User(Resource):
         try:
             db.session.commit()
         except:
-            return {'msg': 'Error deleting user'}, 500
+            return crud_error('deleting', 'user'), 500
         return 200
 
 
@@ -59,9 +62,9 @@ class Users(Resource):
         errors = user_schema.validate(req)
         user_exists = UserModel.query.filter_by(email=req['email']).first()
         if user_exists:
-            return {'msg': 'User already exists with that email address'}, 500
+            return user_exists_message, 500
         if errors:
-            return {'msg': 'Error validating form'}, 500
+            return error_validating_form, 500
         user = UserModel(
             username=req['username'],
             email=req['email'],
@@ -71,7 +74,7 @@ class Users(Resource):
         try:
             db.session.commit()
         except:
-            return {'msg': 'Error creating user'}, 500
+            return crud_error('creating', 'user'), 500
         access_token = create_access_token(identity=user.email)
         user_schema = UserSchema(exclude=['password'])
         user_json = user_schema.dump(user)
