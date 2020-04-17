@@ -3,7 +3,10 @@ from flask_restful import Resource
 from flask_jwt_extended import create_access_token, jwt_required
 from models.user import User as UserModel
 from models.user import UserSchema
-from database import db
+from database import db, try_commit
+from resources.helpers.user_auth import (login_success_response,
+                                         invalid_form,
+                                         user_exists)
 from common.message import (error_validating_form,
                             crud_error,
                             user_exists_message)
@@ -17,36 +20,30 @@ class User(Resource):
 
     @jwt_required
     def put(self, user_id):
-        req = request.get_json()
-        user_schema = UserSchema()
-        errors = user_schema.validate(req)
-        if errors:
+        self.req = request.get_json()
+        if invalid_form(req):
             return error_validating_form, 500
+        self.user = UserModel.query.get(user_id)
+        _set_updated_user_values()
+        if try_commit():
+            return 200
+        return crud_error('updating', 'user'), 500
 
-        user = UserModel.query.get(user_id)
-
-        if 'username' in req:
-            user.username = req['username']
-        if 'email' in req:
-            user.email = req['email']
-        if 'password' in req:
-            user.set_password(req['password'])
-
-        try:
-            db.session.commit()
-        except:
-            return crud_error('updating', 'user'), 500
-        return 200
+    def _set_updated_user_values(self):
+        if 'username' in self.req:
+            self.user.username = self.req['username']
+        if 'email' in self.req:
+            self.user.email = self.req['email']
+        if 'password' in self.req:
+            self.user.set_password(self.req['password'])
 
     @jwt_required
     def delete(self, user_id):
         user = UserModel.query.get(user_id)
         db.session.delete(user)
-        try:
-            db.session.commit()
-        except:
-            return crud_error('deleting', 'user'), 500
-        return 200
+        if try_commit():
+            return 200
+        return crud_error('deleting', 'user'), 500
 
 
 class Users(Resource):
@@ -58,24 +55,17 @@ class Users(Resource):
 
     def post(self):
         req = request.get_json()
-        user_schema = UserSchema()
-        errors = user_schema.validate(req)
-        user_exists = UserModel.query.filter_by(email=req['email']).first()
-        if user_exists:
-            return user_exists_message, 500
-        if errors:
+        if invalid_form(req):
             return error_validating_form, 500
+        if user_exists(req['email']):
+            return user_exists_message, 500
+        #TODO: Marshmallow might be able to do the following automatically
         user = UserModel(
             username=req['username'],
             email=req['email'],
         )
         user.set_password(req['password'])
         db.session.add(user)
-        try:
-            db.session.commit()
-        except:
-            return crud_error('creating', 'user'), 500
-        access_token = create_access_token(identity=user.email)
-        user_schema = UserSchema(exclude=['password'])
-        user_json = user_schema.dump(user)
-        return {'user': user_json, 'access_token': access_token}, 200
+        if try_commit():
+            return login_success_response(user)
+        return crud_error('creating', 'user'), 500
