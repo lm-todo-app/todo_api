@@ -22,11 +22,11 @@ class User(Resource):
 
         user = UserModel.query.get(user_id)
 
-        if req['username']:
+        if 'username' in req:
             user.username = req['username']
-        if req['email']:
+        if 'email' in req:
             user.email = req['email']
-        if req['password']:
+        if 'password' in req:
             user.set_password(req['password'])
 
         try:
