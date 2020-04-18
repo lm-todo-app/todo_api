@@ -45,6 +45,8 @@ class User(Resource):
     @jwt_required
     def delete(self, user_id):
         user = UserModel.query.get(user_id)
+        if not user:
+            return 404
         db.session.delete(user)
         if try_commit():
             return 200
@@ -74,5 +76,5 @@ class Users(Resource):
         user.set_password(req['password'])
         db.session.add(user)
         if try_commit():
-            return login_success_response(user)
+            return login_success_response(user), 200
         return crud_error('creating', 'user'), 500

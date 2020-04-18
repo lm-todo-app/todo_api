@@ -1,0 +1,46 @@
+---
+test_name: User POST creates a new user
+
+stages:
+  - name: create a new user
+
+    request:
+      url: http://localhost:5001/user
+      method: POST
+      json:
+        username: test user
+        email: mail@test.com
+        password: testpassword
+
+    response:
+      status_code: 200
+      json:
+        -
+          user:
+            username: test user
+            id: 1
+            email: mail@test.com
+          access_token: !anything
+        - 200
+
+  # need auth header
+
+  # - name: get new user
+
+    # request:
+      # url: http://localhost:5001/user/1
+      # method: GET
+      # json:
+        # username: test user
+        # email: mail@test.com
+        # password: testpassword
+
+    # response:
+      # status_code: 200
+      # json:
+        # -
+          # user:
+            # username: test user
+            # id: 1
+            # email: mail@test.com
+        # - 200
