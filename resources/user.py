@@ -57,8 +57,6 @@ class Users(Resource):
     @jwt_required
     def get(self):
         users = UserModel.query.all()
-        if not users:
-            return 404
         user_schema = UserSchema(exclude=['password'])
         return user_schema.dump(users, many=True), 200
 
