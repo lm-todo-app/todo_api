@@ -14,10 +14,7 @@ elif ENVIRONMENT == 'production':
     # MySQL connection required
     DEV_DB_URI = os.environ['todo_api_db_uri']
 
-elif ENVIRONMENT == 'test':
-    SECRET = 'secret'
-    JWT_SECRET = 'secret-key'
-    DEV_DB_URI = 'sqlite:////tmp/todo_test.db'
-
 else:
     raise ValueError('Environment is not set properly, see settings file.')
+
+TEST_DB_URI = 'sqlite:////tmp/todo_test.db'
