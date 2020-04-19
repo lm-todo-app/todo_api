@@ -21,5 +21,3 @@ elif ENVIRONMENT == 'test':
 
 else:
     raise ValueError('Environment is not set properly, see settings file.')
-
-TEST_URL = 'http://localhost:5001'
