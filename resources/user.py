@@ -16,7 +16,7 @@ class User(Resource):
     def get(self, user_id):
         user = UserModel.query.get(user_id)
         if not user:
-            return 404
+            return {'success': False}, 404
         user_schema = UserSchema(exclude=['password'])
         return user_schema.dump(user), 200
 
@@ -27,10 +27,10 @@ class User(Resource):
             return error_validating_form, 500
         self.user = UserModel.query.get(user_id)
         if not self.user:
-            return 404
+            return {'success': False}, 404
         self._set_updated_user_values()
         if try_commit():
-            return 200
+            return {'success': True}, 200
         return crud_error('updating', 'user'), 500
 
     def _set_updated_user_values(self):
@@ -46,10 +46,10 @@ class User(Resource):
     def delete(self, user_id):
         user = UserModel.query.get(user_id)
         if not user:
-            return 404
+            return {'success': False}, 404
         db.session.delete(user)
         if try_commit():
-            return 200
+            return {'success': True}, 200
         return crud_error('deleting', 'user'), 500
 
 
