@@ -15,5 +15,6 @@ def crud_error(action, resource):
 
 error_message = message('Error')
 error_validating_form = message('Error validating form')
-user_exists_message = message('User already exists with that email address')
+email_exists_message = message('User already exists with that email address')
+username_exists_message = message('User already exists with that username')
 incorrect_credentials = message('Incorrect email address or password')

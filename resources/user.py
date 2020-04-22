@@ -6,10 +6,12 @@ from models.user import UserSchema
 from database import db, try_commit
 from resources.helpers.user_auth import (login_success_response,
                                          invalid_form,
-                                         user_exists)
+                                         user_exists_email,
+                                         user_exists_username)
 from common.message import (error_validating_form,
                             crud_error,
-                            user_exists_message)
+                            email_exists_message,
+                            username_exists_message)
 
 class User(Resource):
     @jwt_required
@@ -35,9 +37,10 @@ class User(Resource):
 
     def _set_updated_user_values(self):
         if 'username' in self.req:
-            self.user.username = self.req['username']
+            if not user_exists_username(req['username']):
+                self.user.username = self.req['username']
         if 'email' in self.req:
-            if not user_exists(req['email']):
+            if not user_exists_email(req['email']):
                 self.user.email = self.req['email']
         if 'password' in self.req:
             self.user.set_password(self.req['password'])
@@ -64,8 +67,10 @@ class Users(Resource):
         req = request.get_json()
         if invalid_form(req):
             return error_validating_form, 500
-        if user_exists(req['email']):
-            return user_exists_message, 500
+        if user_exists_email(req['email']):
+            return email_exists_message, 500
+        if user_exists_username(req['username']):
+            return username_exists_message, 500
         #TODO: Marshmallow might be able to do the following automatically
         user = UserModel(
             username=req['username'],

@@ -4,12 +4,13 @@ from flask_jwt_extended import create_access_token
 from models.user import User as UserModel
 from models.user import UserSchema
 from common.message import error_message, incorrect_credentials
-from resources.helpers.user_auth import login_success_response, invalid_form
+from resources.helpers.user_auth import (login_success_response,
+                                         invalid_form_exclude_username)
 
 class Auth(Resource):
     def post(self):
         req = request.get_json()
-        if invalid_form(req):
+        if invalid_form_no_username(req):
             return incorrect_credentials, 500
         user = UserModel.query.filter_by(email=req['email']).first()
         if user and user.check_password(req['password']):

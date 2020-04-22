@@ -17,10 +17,23 @@ def test_create_user(client):
     TOKEN = 'Bearer ' + response.json[0]['access_token']
     assert response.status_code == 200
 
-def test_create_user_already_exists(client):
+def test_create_email_already_exists(client):
     data = {
         "username": "another user",
         "email": "mail@test.com",
+        "password": "anotherpassword"
+    }
+    headers = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+    }
+    response = client.post("/user", data=json.dumps(data), headers=headers)
+    assert response.status_code == 500
+
+def test_create_username_already_exists(client):
+    data = {
+        "username": "test user",
+        "email": "mail2@test.com",
         "password": "anotherpassword"
     }
     headers = {
