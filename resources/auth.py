@@ -10,7 +10,7 @@ from resources.helpers.user_auth import (login_success_response,
 class Auth(Resource):
     def post(self):
         req = request.get_json()
-        if invalid_form_no_username(req):
+        if invalid_form_exclude_username(req):
             return incorrect_credentials, 500
         user = UserModel.query.filter_by(email=req['email']).first()
         if user and user.check_password(req['password']):

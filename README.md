@@ -14,7 +14,7 @@ Clone repo and then run the following:
 
 `pyenv install 3.8.1`
 
-`pipenv --python 3.8.1 install`
+`pipenv --python 3.8.1 install --dev`
 
 If you have direnv installed run:
 
