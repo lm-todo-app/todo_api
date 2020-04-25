@@ -68,18 +68,18 @@ def test_create_user_null_email(client):
     response = client.post("/user", data=json.dumps(data), headers=headers)
     assert response.status_code == 500
 
-#  def test_create_user_empty_email(client):
-    #  data = {
-        #  "username": "another user 4",
-        #  "email": "",
-        #  "password": "testpassword"
-    #  }
-    #  headers = {
-        #  'Content-Type': 'application/json',
-        #  'Accept': 'application/json'
-    #  }
-    #  response = client.post("/user", data=json.dumps(data), headers=headers)
-    #  assert response.status_code == 500
+def test_create_user_empty_email(client):
+    data = {
+        "username": "another user 4",
+        "email": "",
+        "password": "testpassword"
+    }
+    headers = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+    }
+    response = client.post("/user", data=json.dumps(data), headers=headers)
+    assert response.status_code == 500
 
 def test_create_user_no_username(client):
     data = {
@@ -123,6 +123,19 @@ def test_create_user_null_password(client):
         "username": "another user 6",
         "email": "mail6@test.com",
         "password": None
+    }
+    headers = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+    }
+    response = client.post("/user", data=json.dumps(data), headers=headers)
+    assert response.status_code == 500
+
+def test_create_user_whitespace_password(client):
+    data = {
+        "username": "another user 7",
+        "email": "mail7@test.com",
+        "password": 'whitespace in password'
     }
     headers = {
         'Content-Type': 'application/json',

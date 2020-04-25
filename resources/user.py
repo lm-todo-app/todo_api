@@ -71,6 +71,8 @@ class Users(Resource):
             return email_exists_message, 500
         if user_exists_username(req['username']):
             return username_exists_message, 500
+        if ' ' in req['password']:
+            return {'message': 'spaces are not allowed in password'}, 500
         #TODO: Marshmallow might be able to do the following automatically
         user = UserModel(
             username=req['username'],

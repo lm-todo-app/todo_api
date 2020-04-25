@@ -1,5 +1,6 @@
 from werkzeug.security import generate_password_hash, check_password_hash
 from database import db, ma
+from marshmallow import fields, validate, pre_load
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -19,3 +20,23 @@ class User(db.Model):
 class UserSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = User
+
+    email = fields.Email(required=True)
+    username = fields.Str(
+        validate=validate.Length(min=5, max=100),
+        required=True
+    )
+    password = fields.Str(
+        validate=validate.Length(min=8, max=100),
+        required=True
+    )
+
+    @pre_load
+    def process_input(self, data, **kwargs):
+        if data.get('email'):
+            data["email"] = data["email"].lower().strip()
+        if data.get('username'):
+            data["username"] = data["username"].strip()
+        if data.get('password'):
+            data["password"] = data["password"].strip()
+        return data
