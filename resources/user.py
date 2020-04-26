@@ -1,6 +1,6 @@
 from flask import request
 from flask_restful import Resource
-from flask_jwt_extended import create_access_token, jwt_required
+from flask_jwt_extended import jwt_required
 from models.user import User as UserModel
 from models.user import UserSchema
 from database import db, try_commit
@@ -14,6 +14,10 @@ from common.message import (error_validating_form,
                             username_exists_message)
 
 class User(Resource):
+    def __init__(self):
+        self.req = None
+        self.user = None
+
     @jwt_required
     def get(self, user_id):
         user = UserModel.query.get(user_id)
@@ -37,10 +41,10 @@ class User(Resource):
 
     def _set_updated_user_values(self):
         if 'username' in self.req:
-            if not user_exists_username(req['username']):
+            if not user_exists_username(self.req['username']):
                 self.user.username = self.req['username']
         if 'email' in self.req:
-            if not user_exists_email(req['email']):
+            if not user_exists_email(self.req['email']):
                 self.user.email = self.req['email']
         if 'password' in self.req:
             self.user.set_password(self.req['password'])

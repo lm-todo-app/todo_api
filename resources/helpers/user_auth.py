@@ -12,17 +12,17 @@ def login_success_response(user):
 def invalid_form_exclude_username(req):
     user_schema = UserSchema(exclude=['username'])
     errors = user_schema.validate(req)
-    return True if errors else False
+    return bool(errors)
 
 def invalid_form(req):
     user_schema = UserSchema()
     errors = user_schema.validate(req)
-    return True if errors else False
+    return bool(errors)
 
 def user_exists_email(email):
     user = UserModel.query.filter_by(email=email).first()
-    return True if user else False
+    return bool(user)
 
 def user_exists_username(username):
     user = UserModel.query.filter_by(username=username).first()
-    return True if user else False
+    return bool(user)

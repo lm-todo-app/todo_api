@@ -1,9 +1,9 @@
-from settings import SECRET, JWT_SECRET, DEV_DB_URI
 from flask import Flask
 from flask_restful import Api
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from flask_migrate import Migrate
+from settings import SECRET, JWT_SECRET, DEV_DB_URI
 from database import db, ma
 from resources.user import Users, User
 from resources.auth import Auth

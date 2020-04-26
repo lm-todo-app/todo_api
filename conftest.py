@@ -1,7 +1,7 @@
-from settings import TEST_DB_URI
+import pytest
 from app import app
 from database import db
-import pytest
+from settings import TEST_DB_URI
 
 @pytest.fixture
 def client():

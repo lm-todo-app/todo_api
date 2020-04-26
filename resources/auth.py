@@ -1,9 +1,7 @@
 from flask import request
 from flask_restful import Resource
-from flask_jwt_extended import create_access_token
 from models.user import User as UserModel
-from models.user import UserSchema
-from common.message import error_message, incorrect_credentials
+from common.message import incorrect_credentials
 from resources.helpers.user_auth import (login_success_response,
                                          invalid_form_exclude_username)
 
