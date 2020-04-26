@@ -2,3 +2,5 @@ language: python
 python: "3.8"
 install: pipenv install --dev
 script: pytest
+env:
+  - FLASK_ENV=development
