@@ -5,9 +5,9 @@ script: pytest
 env:
   - FLASK_ENV=development
 notifications:
-    webhooks:
-        urls:
-            - "https://scalar.vector.im/api/neb/services/hooks/dHJhdmlzLWNpLyU0MGxtYXJjbzg5JTNBbWF0cml4Lm9yZy8lMjFLbmNSTEV5ak1TTUdmWGRDT2IlM0FtYXRyaXgub3Jn"
-        on_success: change  # always|never|change
-        on_failure: always
-        on_start: never
+  webhooks:
+    urls:
+      - "https://scalar.vector.im/api/neb/services/hooks/dHJhdmlzLWNpLyU0MGxtYXJjbzg5JTNBbWF0cml4Lm9yZy8lMjFLbmNSTEV5ak1TTUdmWGRDT2IlM0FtYXRyaXgub3Jn"
+    on_success: change  # always|never|change
+    on_failure: always
+    on_start: never
