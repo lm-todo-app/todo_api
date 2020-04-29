@@ -11,7 +11,8 @@ from resources.helpers.user_auth import (login_success_response,
 from common.message import (error_validating_form,
                             crud_error,
                             email_exists_message,
-                            username_exists_message)
+                            username_exists_message,
+                            success, fail, error)
 
 class User(Resource):
     def __init__(self):
@@ -22,22 +23,22 @@ class User(Resource):
     def get(self, user_id):
         user = UserModel.query.get(user_id)
         if not user:
-            return {'success': False}, 404
+            return fail(404)
         user_schema = UserSchema(exclude=['password'])
-        return user_schema.dump(user), 200
+        return success(200, user_schema.dump(user))
 
     @jwt_required
     def put(self, user_id):
         self.req = request.get_json()
         if invalid_form(self.req):
-            return error_validating_form, 500
+            return error(400, error_validating_form)
         self.user = UserModel.query.get(user_id)
         if not self.user:
-            return {'success': False}, 404
+            return fail(404)
         self._set_updated_user_values()
         if try_commit():
-            return {'success': True}, 200
-        return crud_error('updating', 'user'), 500
+            return success(200)
+        return error(500, crud_error('updating', 'user'))
 
     def _set_updated_user_values(self):
         if 'username' in self.req:
@@ -53,11 +54,11 @@ class User(Resource):
     def delete(self, user_id):
         user = UserModel.query.get(user_id)
         if not user:
-            return {'success': False}, 404
+            return fail(404)
         db.session.delete(user)
         if try_commit():
-            return {'success': True}, 200
-        return crud_error('deleting', 'user'), 500
+            return success(200)
+        return error(500, crud_error('deleting', 'user'))
 
 
 class Users(Resource):
@@ -65,18 +66,18 @@ class Users(Resource):
     def get(self):
         users = UserModel.query.all()
         user_schema = UserSchema(exclude=['password'])
-        return user_schema.dump(users, many=True), 200
+        return success(200, user_schema.dump(users, many=True))
 
     def post(self):
         req = request.get_json()
         if invalid_form(req):
-            return error_validating_form, 500
+            return error(400, error_validating_form)
         if user_exists_email(req['email']):
-            return email_exists_message, 500
+            return fail(409, email_exists_message)
         if user_exists_username(req['username']):
-            return username_exists_message, 500
+            return fail(409, username_exists_message)
         if ' ' in req['password']:
-            return {'message': 'spaces are not allowed in password'}, 500
+            return fail(400, {'message': 'spaces are not allowed in password'})
         #TODO: Marshmallow might be able to do the following automatically
         user = UserModel(
             username=req['username'],
@@ -86,4 +87,4 @@ class Users(Resource):
         db.session.add(user)
         if try_commit():
             return login_success_response(user), 200
-        return crud_error('creating', 'user'), 500
+        return error(500, crud_error('creating', 'user'))

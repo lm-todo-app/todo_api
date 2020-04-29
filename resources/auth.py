@@ -12,5 +12,5 @@ class Auth(Resource):
             return incorrect_credentials, 500
         user = UserModel.query.filter_by(email=req['email']).first()
         if user and user.check_password(req['password']):
-            return login_success_response(user)
+            return login_success_response(user), 200
         return incorrect_credentials, 401
