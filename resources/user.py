@@ -4,15 +4,11 @@ from flask_jwt_extended import jwt_required
 from models.user import User as UserModel
 from models.user import UserSchema
 from database import db, try_commit
+from common.response import success, fail, error
 from resources.helpers.user_auth import (login_success_response,
                                          invalid_form,
                                          user_exists_email,
                                          user_exists_username)
-from common.message import (error_validating_form,
-                            crud_error,
-                            email_exists_message,
-                            username_exists_message,
-                            success, fail, error)
 
 class User(Resource):
     def __init__(self):
@@ -23,22 +19,26 @@ class User(Resource):
     def get(self, user_id):
         user = UserModel.query.get(user_id)
         if not user:
-            return fail(404)
+            message = {'user': 'User does not exist'}
+            return fail(message), 404
         user_schema = UserSchema(exclude=['password'])
-        return success(200, user_schema.dump(user))
+        return success(user_schema.dump(user))
 
     @jwt_required
     def put(self, user_id):
         self.req = request.get_json()
         if invalid_form(self.req):
-            return error(400, error_validating_form)
+            message = {'form': 'Error validating form'}
+            return fail(message), 400
         self.user = UserModel.query.get(user_id)
         if not self.user:
-            return fail(404)
+            message = {'user': 'User does not exist'}
+            return fail(message), 404
         self._set_updated_user_values()
         if try_commit():
-            return success(200)
-        return error(500, crud_error('updating', 'user'))
+            return success()
+        message = {'user': 'Error updating user'}
+        return error(message), 500
 
     def _set_updated_user_values(self):
         if 'username' in self.req:
@@ -54,11 +54,13 @@ class User(Resource):
     def delete(self, user_id):
         user = UserModel.query.get(user_id)
         if not user:
-            return fail(404)
+            message = {'user': 'User does not exist'}
+            return fail(message), 404
         db.session.delete(user)
         if try_commit():
-            return success(200)
-        return error(500, crud_error('deleting', 'user'))
+            return success()
+        message = {'user': 'Error deleting user'}
+        return error(message), 500
 
 
 class Users(Resource):
@@ -66,18 +68,22 @@ class Users(Resource):
     def get(self):
         users = UserModel.query.all()
         user_schema = UserSchema(exclude=['password'])
-        return success(200, user_schema.dump(users, many=True))
+        return success(user_schema.dump(users, many=True))
 
     def post(self):
         req = request.get_json()
         if invalid_form(req):
-            return error(400, error_validating_form)
+            message = {'form': 'Error validating form'}
+            return error(message), 400
         if user_exists_email(req['email']):
-            return fail(409, email_exists_message)
+            message = {'user': 'User already exists with this email'}
+            return fail(message), 409
         if user_exists_username(req['username']):
-            return fail(409, username_exists_message)
+            message = {'user': 'User already exists with this username'}
+            return fail(message), 409
         if ' ' in req['password']:
-            return fail(400, {'message': 'spaces are not allowed in password'})
+            message = {'form': 'Spaces are not allowed in password'}
+            return fail(message), 400
         #TODO: Marshmallow might be able to do the following automatically
         user = UserModel(
             username=req['username'],
@@ -87,4 +93,5 @@ class Users(Resource):
         db.session.add(user)
         if try_commit():
             return login_success_response(user), 200
-        return error(500, crud_error('creating', 'user'))
+        message = {'user': 'Error creating user'}
+        return error(message), 500
