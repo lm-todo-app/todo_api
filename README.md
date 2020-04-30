@@ -47,10 +47,10 @@ Flask migrations need to be reviewed as they are not always correct.
 
 To run tests:
 
-`./test.sh`
+`./scripts/test.sh`
 
 This can be run on change/save using [entr](http://eradman.com/entrproject/) with:
 
-`ls | entr ./test.sh`
+`ls | entr ./scripts/test.sh`
 
 ---

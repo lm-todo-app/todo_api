@@ -84,12 +84,7 @@ class Users(Resource):
         if ' ' in req['password']:
             message = {'form': 'Spaces are not allowed in password'}
             return fail(message), 400
-        #TODO: Marshmallow might be able to do the following automatically
-        user = UserModel(
-            username=req['username'],
-            email=req['email'],
-        )
-        user.set_password(req['password'])
+        user = UserModel.create_user(req)
         db.session.add(user)
         if try_commit():
             return login_success_response(user), 200

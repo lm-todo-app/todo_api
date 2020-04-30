@@ -17,6 +17,20 @@ class User(db.Model):
     def check_password(self, password):
         return check_password_hash(self.password, password)
 
+    @staticmethod
+    def create_user(req):
+        """
+        Creating user to be saved here instead of using marshmallow so that we
+        can set the hashed the password.
+        """
+        # TODO: Marshmallow may be able to replace this function.
+        user = User(
+            username=req['username'],
+            email=req['email'],
+        )
+        user.set_password(req['password'])
+        return user
+
 class UserSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = User
