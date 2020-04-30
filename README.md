@@ -2,13 +2,13 @@
 
 ---
 
-### Setup
+## Setup
 
 Prerequisites:
 
-- pyenv
-- pipenv
-- direnv (optional)
+-   pyenv
+-   pipenv
+-   direnv (optional)
 
 Clone repo and then run the following:
 
@@ -32,18 +32,18 @@ Setting FLASK_ENV to development as env variable is advised
 
 ---
 
-### Flask Migrate
+## Flask Migrate
 
 After creating or editing a model:
 
-- run `flask db migrate -m "NAME OF MIGRATION"`
-- run `flask db upgrade`
+-   run `flask db migrate -m "NAME OF MIGRATION"`
+-   run `flask db upgrade`
 
 Flask migrations need to be reviewed as they are not always correct.
 
 ---
 
-### Tests
+## Tests
 
 To run tests:
 
