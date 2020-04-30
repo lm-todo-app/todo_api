@@ -4,9 +4,7 @@ install: pipenv install --dev
 script: pytest --cov .
 after_success: coveralls
 env:
-  - FLASK_ENV=development
-  - todo_api_secret=secret
-  - todo_api_jwt_secret=secret-key
+  - FLASK_ENV=development todo_api_secret=secret todo_api_jwt_secret=secret-key
 notifications:
   webhooks:
     urls:
