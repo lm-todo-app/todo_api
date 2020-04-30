@@ -1,4 +1,6 @@
-# todo_api
+[![Build Status](https://travis-ci.com/lm-todo-app/todo_api.svg?branch=master)](https://travis-ci.com/lm-todo-app/todo_api)
+[![Coverage Status](https://coveralls.io/repos/github/lm-todo-app/todo_api/badge.svg?branch=master)](https://coveralls.io/github/lm-todo-app/todo_api?branch=master)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/d773b279472a4f6eab6d69d8b602c2ab)](https://www.codacy.com/gh/lm-todo-app/todo_api?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=lm-todo-app/todo_api&amp;utm_campaign=Badge_Grade)
 
 ---
 
