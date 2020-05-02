@@ -1,3 +1,4 @@
+import string
 from flask import abort
 from flask_jwt_extended import create_access_token
 from models.user import User as UserModel
@@ -46,6 +47,25 @@ def get_user(user_id):
     return user
 
 def validate_password_strength(password):
+    """
+    Check if the password the user supplies when signing up contains:
+        no whitespace
+        8 characters or greater
+        at least 1 uppercase character
+        at least 1 digit
+        at least 1 special character
+    """
+    message = {}
     if ' ' in password:
-        message = {'form': 'Spaces are not allowed in password'}
-        abort(400, message)
+        message['whitespace'] = 'whitespace is not allowed'
+    if len(password) < 8:
+        message['length'] = 'must be 8 characters in length'
+    if not any(char.isupper() for char in password):
+        message['uppercase'] = 'must contain at least one uppercase letter'
+    if not any(char.isdigit() for char in password):
+        message['number'] = 'must contain at least one number'
+    special_characters = string.punctuation
+    if not any(char in special_characters for char in password):
+        message['symbol'] = 'must contain at least one symbol'
+    if message:
+        abort(400, {'password': message})

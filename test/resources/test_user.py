@@ -10,7 +10,7 @@ def test_create_user(client):
     data = {
         "username": "test user",
         "email": "mail@test.com",
-        "password": "testpassword"
+        "password": "Testpassword@1"
     }
     response = client.post("/user", data=json.dumps(data), headers=HEADERS)
     global TOKEN
@@ -21,7 +21,7 @@ def test_create_email_already_exists(client):
     data = {
         "username": "another user 1",
         "email": "mail@test.com",
-        "password": "anotherpassword"
+        "password": "Anotherpassword@1"
     }
     response = client.post("/user", data=json.dumps(data), headers=HEADERS)
     assert response.status_code == 409
@@ -30,7 +30,7 @@ def test_create_username_already_exists(client):
     data = {
         "username": "test user",
         "email": "mail2@test.com",
-        "password": "anotherpassword"
+        "password": "Anotherpassword@1"
     }
     response = client.post("/user", data=json.dumps(data), headers=HEADERS)
     assert response.status_code == 409
@@ -38,7 +38,7 @@ def test_create_username_already_exists(client):
 def test_create_user_no_email(client):
     data = {
         "username": "another user 2",
-        "password": "testpassword"
+        "password": "Testpassword@1"
     }
     response = client.post("/user", data=json.dumps(data), headers=HEADERS)
     assert response.status_code == 400
@@ -47,7 +47,7 @@ def test_create_user_null_email(client):
     data = {
         "username": "another user 3",
         "email": None,
-        "password": "testpassword"
+        "password": "Testpassword@1"
     }
     response = client.post("/user", data=json.dumps(data), headers=HEADERS)
     assert response.status_code == 400
@@ -56,7 +56,7 @@ def test_create_user_empty_email(client):
     data = {
         "username": "another user 4",
         "email": "",
-        "password": "testpassword"
+        "password": "Testpassword@1"
     }
     response = client.post("/user", data=json.dumps(data), headers=HEADERS)
     assert response.status_code == 400
@@ -64,7 +64,7 @@ def test_create_user_empty_email(client):
 def test_create_user_no_username(client):
     data = {
         "email": "mail3@test.com",
-        "password": "testpassword"
+        "password": "Testpassword@1"
     }
     response = client.post("/user", data=json.dumps(data), headers=HEADERS)
     assert response.status_code == 400
@@ -73,7 +73,7 @@ def test_create_user_null_username(client):
     data = {
         "username": None,
         "email": "mail4@test.com",
-        "password": "testpassword"
+        "password": "Testpassword@1"
     }
     response = client.post("/user", data=json.dumps(data), headers=HEADERS)
     assert response.status_code == 400
