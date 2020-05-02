@@ -1,3 +1,4 @@
+from flask import abort
 from flask_jwt_extended import create_access_token
 from models.user import User as UserModel
 from models.user import UserSchema
@@ -14,15 +15,37 @@ def invalid_form_exclude_username(req):
     errors = user_schema.validate(req)
     return bool(errors)
 
-def invalid_form(req):
+def validate_form(req):
     user_schema = UserSchema()
     errors = user_schema.validate(req)
-    return bool(errors)
+    if errors:
+        message = {'form': 'Error validating form'}
+        abort(400, message)
 
-def user_exists_email(email):
+def validate_unique_email(email):
     user = UserModel.query.filter_by(email=email).first()
-    return bool(user)
+    if user:
+        message = {'user': 'User already exists with this email'}
+        abort(409, message)
 
-def user_exists_username(username):
+def validate_unique_username(username):
     user = UserModel.query.filter_by(username=username).first()
-    return bool(user)
+    if user:
+        message = {'user': 'User already exists with this username'}
+        abort(409, message)
+
+def get_user(user_id):
+    """
+    Leaving this here instead of moving this to the model because it uses flask
+    abort and we don't want the model methods to use that.
+    """
+    user = UserModel.query.get(user_id)
+    if not user:
+        message = {'user': 'User does not exist'}
+        abort(404, message)
+    return user
+
+def validate_password_strength(password):
+    if ' ' in password:
+        message = {'form': 'Spaces are not allowed in password'}
+        abort(400, message)
