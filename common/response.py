@@ -12,7 +12,7 @@ def success(data=None):
 
     Required keys:
 
-        status: Should always be set to "success".
+        status: Should always be set to 'success'.
         data: Acts as the wrapper for any data returned by the API call. If the
         call returns no data (as in the last example), data should be set to
         null.
@@ -30,7 +30,7 @@ def fail(status_code, data=None):
 
     Required keys:
 
-        status: Should always be set to "fail".
+        status: Should always be set to 'fail'.
         data: provides the wrapper for the details of why the request
         failed. If the reasons for failure correspond to POST values, the
         response object's keys SHOULD correspond to those POST values.
@@ -43,7 +43,7 @@ def error(status_code, message, data=None):
 
     Required keys:
 
-        status: Should always be set to "error".
+        status: Should always be set to 'error'.
         message: A meaningful, end-user-readable (or at the least log-worthy)
         message, explaining what went wrong.
 

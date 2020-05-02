@@ -2,7 +2,7 @@ import string
 from flask_jwt_extended import create_access_token
 from models.user import User as UserModel
 from models.user import UserSchema
-from common.response import fail, error
+from common.response import fail
 
 def login_success_response(user):
     email = user.email
