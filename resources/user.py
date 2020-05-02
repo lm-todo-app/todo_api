@@ -34,7 +34,7 @@ class User(Resource):
         if try_commit():
             return success()
         message = {'user': 'Error updating user'}
-        return error(message), 500
+        return error(500, message)
 
     def _set_updated_user_values(self):
         """
@@ -61,10 +61,14 @@ class User(Resource):
         if try_commit():
             return success()
         message = {'user': 'Error deleting user'}
-        return error(message), 500
+        return error(500, message)
 
 
 class Users(Resource):
+    def __init__(self):
+        self.req = None
+        self.user = None
+
     @jwt_required
     def get(self):
         users = UserModel.query.all()
@@ -75,17 +79,29 @@ class Users(Resource):
         """
         Check that the username, and email are not already in use by another
         user and check the password strength is sufficient as the average user
-        will need this feature. If this is successful then create the user.
+        will need this check. If this is successful then create the user.
         """
-        req = request.get_json()
-        validate_form(req)
-        validate_unique_email(req['email'])
-        validate_unique_username(req['username'])
-        validate_password_strength(req['password'])
-        user = UserModel.create_user(req)
-        db.session.add(user)
-        try_commit()
+        self.req = request.get_json()
+        validate_form(self.req)
+        validate_unique_email(self.req['email'])
+        validate_unique_username(self.req['username'])
+        validate_password_strength(self.req['password'])
+        self._create_user()
         if try_commit():
-            return login_success_response(user), 200
+            return login_success_response(self.user), 200
         message = {'user': 'Error creating user'}
-        return error(message), 500
+        return error(500, message)
+
+    def _create_user(self):
+        """
+        We need to exclude the password from the request as it needs to be
+        hashed before being saved to the database. We exclude it from the
+        marshmallow loads which creates the user model object and then add the
+        hashed password to the user object.
+        """
+        user_schema = UserSchema(exclude=['password'])
+        password = self.req['password']
+        self.req.pop('password')
+        self.user = user_schema.load(self.req, session=db.session)
+        self.user.set_password(password)
+        db.session.add(self.user)

@@ -14,7 +14,7 @@ def test_create_user(client):
     }
     response = client.post("/user", data=json.dumps(data), headers=HEADERS)
     global TOKEN
-    TOKEN = 'Bearer ' + response.json['access_token']
+    TOKEN = 'Bearer ' + response.json['accessToken']
     assert response.status_code == 200
 
 def test_create_email_already_exists(client):

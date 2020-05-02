@@ -1,3 +1,4 @@
+from flask_restful import abort
 """
 The following functions aim to standardise the JSON responses from this API.
 This follows the jsend standard with the exception that a status code will be
@@ -21,7 +22,7 @@ def success(data=None):
         'data': data
     }
 
-def fail(data=None):
+def fail(status_code, data=None):
     """
     When an API call is rejected due to invalid data or call conditions, the
     JSend object's data key contains an object explaining what went wrong,
@@ -34,12 +35,9 @@ def fail(data=None):
         failed. If the reasons for failure correspond to POST values, the
         response object's keys SHOULD correspond to those POST values.
     """
-    return {
-        'status': 'fail',
-        'data': data
-    }
+    abort(status_code, status='fail', data=data)
 
-def error(message, data=None):
+def error(status_code, message, data=None):
     """
     When an API call fails due to an error on the server.
 
@@ -57,8 +55,4 @@ def error(message, data=None):
 
     code is currently not used for any errors.
     """
-    return {
-        'status': 'error',
-        'message': message,
-        'data': data
-    }
+    abort(status_code, status='error', message=message, data=data)
