@@ -5,6 +5,8 @@ from models.user import User as UserModel
 from models.user import UserSchema
 from database import db, try_commit
 from common.response import success, error
+from resources.helpers.confirm import generate_confirmation_token
+from mail import send_email
 from resources.helpers.user_auth import (
     login_success_response,
     validate_form,
@@ -34,7 +36,7 @@ class User(Resource):
         if try_commit():
             return success()
         message = {'user': 'Error updating user'}
-        return error(500, message)
+        error(500, message)
 
     def _set_updated_user_values(self):
         """
@@ -61,11 +63,12 @@ class User(Resource):
         if try_commit():
             return success()
         message = {'user': 'Error deleting user'}
-        return error(500, message)
+        error(500, message)
 
 
 class Users(Resource):
     def __init__(self):
+        self.request = None
         self.req = None
         self.user = None
 
@@ -82,15 +85,17 @@ class Users(Resource):
         will need this check. If this is successful then create the user.
         """
         self.req = request.get_json()
+        self.request = request
         validate_form(self.req)
         validate_unique_email(self.req['email'])
         validate_unique_username(self.req['username'])
         validate_password_strength(self.req['password'])
         self._create_user()
         if try_commit():
-            return login_success_response(self.user), 200
+            self._send_confirmation_email()
+            return success({'confirm': 'Please confirm email address'})
         message = {'user': 'Error creating user'}
-        return error(500, message)
+        error(500, message)
 
     def _create_user(self):
         """
@@ -105,3 +110,15 @@ class Users(Resource):
         self.user = user_schema.load(self.req, session=db.session)
         self.user.set_password(password)
         db.session.add(self.user)
+
+    def _send_confirmation_email(self):
+        """
+        Prints the confirmation link to the console for development so we don't
+        need an smtp server setup. The send_email function only sends an email
+        in production.
+        """
+        token = generate_confirmation_token(self.user.email)
+        confirm_url = self.request.url_root + 'confirm/' + token
+        print('\nConfirm URL:')
+        print(confirm_url + '\n')
+        send_email(self.user.email, 'confirm email', 'confirmation_email.html')

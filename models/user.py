@@ -10,6 +10,7 @@ class User(db.Model):
     password = db.Column(db.String(200), unique=True, nullable=False)
     first_name = db.Column(db.String(200), unique=False, nullable=True)
     last_name = db.Column(db.String(200), unique=False, nullable=True)
+    confirmed_on = db.Column(db.DateTime, nullable=True)
 
     def __repr__(self):
         return self.username

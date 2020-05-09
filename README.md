@@ -39,7 +39,7 @@ Setting FLASK_ENV to development as env variable is advised
 After creating or editing a model:
 
 -   run `flask db migrate -m "NAME OF MIGRATION"`
--   run `flask db upgrade`
+-   run `flask db upgrade head`
 
 Flask migrations need to be reviewed as they are not always correct.
 

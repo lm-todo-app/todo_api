@@ -1,4 +1,5 @@
 import json
+from resources.helpers.confirm import generate_confirmation_token
 
 TOKEN = ''
 HEADERS = {
@@ -13,6 +14,13 @@ def test_create_user(client):
         "password": "Testpassword@1"
     }
     response = client.post("/user", data=json.dumps(data), headers=HEADERS)
+    conf_token = generate_confirmation_token(data['email'])
+    response = client.get('/confirm/' + conf_token)
+    data = {
+        "email": "mail@test.com",
+        "password": "Testpassword@1"
+    }
+    response = client.post("/auth", data=json.dumps(data), headers=HEADERS)
     global TOKEN
     TOKEN = 'Bearer ' + response.json['accessToken']
     assert response.status_code == 200
