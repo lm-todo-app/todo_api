@@ -13,14 +13,14 @@ def test_create_user(client):
         "email": "mail@test.com",
         "password": "Testpassword@1"
     }
-    response = client.post("/user", data=json.dumps(data), headers=HEADERS)
+    response = client.post("/users", data=json.dumps(data), headers=HEADERS)
     conf_token = generate_confirmation_token(data['email'])
     response = client.get('/confirm/' + conf_token)
     data = {
         "email": "mail@test.com",
         "password": "Testpassword@1"
     }
-    response = client.post("/auth", data=json.dumps(data), headers=HEADERS)
+    response = client.post("/users/auth", data=json.dumps(data), headers=HEADERS)
     global TOKEN
     TOKEN = 'Bearer ' + response.json['accessToken']
     assert response.status_code == 200
@@ -31,7 +31,7 @@ def test_create_email_already_exists(client):
         "email": "mail@test.com",
         "password": "Anotherpassword@1"
     }
-    response = client.post("/user", data=json.dumps(data), headers=HEADERS)
+    response = client.post("/users", data=json.dumps(data), headers=HEADERS)
     assert response.status_code == 409
 
 def test_create_username_already_exists(client):
@@ -40,7 +40,7 @@ def test_create_username_already_exists(client):
         "email": "mail2@test.com",
         "password": "Anotherpassword@1"
     }
-    response = client.post("/user", data=json.dumps(data), headers=HEADERS)
+    response = client.post("/users", data=json.dumps(data), headers=HEADERS)
     assert response.status_code == 409
 
 def test_create_user_no_email(client):
@@ -48,7 +48,7 @@ def test_create_user_no_email(client):
         "username": "another user 2",
         "password": "Testpassword@1"
     }
-    response = client.post("/user", data=json.dumps(data), headers=HEADERS)
+    response = client.post("/users", data=json.dumps(data), headers=HEADERS)
     assert response.status_code == 400
 
 def test_create_user_null_email(client):
@@ -57,7 +57,7 @@ def test_create_user_null_email(client):
         "email": None,
         "password": "Testpassword@1"
     }
-    response = client.post("/user", data=json.dumps(data), headers=HEADERS)
+    response = client.post("/users", data=json.dumps(data), headers=HEADERS)
     assert response.status_code == 400
 
 def test_create_user_empty_email(client):
@@ -66,7 +66,7 @@ def test_create_user_empty_email(client):
         "email": "",
         "password": "Testpassword@1"
     }
-    response = client.post("/user", data=json.dumps(data), headers=HEADERS)
+    response = client.post("/users", data=json.dumps(data), headers=HEADERS)
     assert response.status_code == 400
 
 def test_create_user_no_username(client):
@@ -74,7 +74,7 @@ def test_create_user_no_username(client):
         "email": "mail3@test.com",
         "password": "Testpassword@1"
     }
-    response = client.post("/user", data=json.dumps(data), headers=HEADERS)
+    response = client.post("/users", data=json.dumps(data), headers=HEADERS)
     assert response.status_code == 400
 
 def test_create_user_null_username(client):
@@ -83,7 +83,7 @@ def test_create_user_null_username(client):
         "email": "mail4@test.com",
         "password": "Testpassword@1"
     }
-    response = client.post("/user", data=json.dumps(data), headers=HEADERS)
+    response = client.post("/users", data=json.dumps(data), headers=HEADERS)
     assert response.status_code == 400
 
 def test_create_user_no_password(client):
@@ -91,7 +91,7 @@ def test_create_user_no_password(client):
         "username": "another user 5",
         "email": "mail5@test.com",
     }
-    response = client.post("/user", data=json.dumps(data), headers=HEADERS)
+    response = client.post("/users", data=json.dumps(data), headers=HEADERS)
     assert response.status_code == 400
 
 def test_create_user_null_password(client):
@@ -100,7 +100,7 @@ def test_create_user_null_password(client):
         "email": "mail6@test.com",
         "password": None
     }
-    response = client.post("/user", data=json.dumps(data), headers=HEADERS)
+    response = client.post("/users", data=json.dumps(data), headers=HEADERS)
     assert response.status_code == 400
 
 def test_create_user_whitespace_password(client):
@@ -109,7 +109,7 @@ def test_create_user_whitespace_password(client):
         "email": "mail7@test.com",
         "password": 'whitespace in password'
     }
-    response = client.post("/user", data=json.dumps(data), headers=HEADERS)
+    response = client.post("/users", data=json.dumps(data), headers=HEADERS)
     assert response.status_code == 400
 
 def test_get_user(client):
@@ -118,7 +118,7 @@ def test_get_user(client):
         'Accept': 'application/json',
         'Authorization': TOKEN
     }
-    response = client.get("/user/1", headers=headers)
+    response = client.get("/users/1", headers=headers)
     assert response.status_code == 200
 
 def test_get_user_does_not_exist(client):
@@ -127,7 +127,7 @@ def test_get_user_does_not_exist(client):
         'Accept': 'application/json',
         'Authorization': TOKEN
     }
-    response = client.get("/user/100", headers=headers)
+    response = client.get("/users/100", headers=headers)
     assert response.status_code == 404
 
 def test_get_users(client):
@@ -136,19 +136,19 @@ def test_get_users(client):
         'Accept': 'application/json',
         'Authorization': TOKEN
     }
-    response = client.get("/user", headers=headers)
+    response = client.get("/users", headers=headers)
     assert response.status_code == 200
 
 def test_delete_user_does_not_exist(client):
     headers = {
         'Authorization': TOKEN
     }
-    response = client.delete("/user/100", headers=headers)
+    response = client.delete("/users/100", headers=headers)
     assert response.status_code == 404
 
 def test_delete_user(client):
     headers = {
         'Authorization': TOKEN
     }
-    response = client.delete("/user/1", headers=headers)
+    response = client.delete("/users/1", headers=headers)
     assert response.status_code == 200

@@ -17,6 +17,8 @@ def success(data=None):
         call returns no data (as in the last example), data should be set to
         null.
     """
+    if not isinstance(data, (dict, list)) and data is not None:
+        data = {'data': data}
     return {
         'status': 'success',
         'data': data
@@ -35,6 +37,8 @@ def fail(status_code, data=None):
         failed. If the reasons for failure correspond to POST values, the
         response object's keys SHOULD correspond to those POST values.
     """
+    if not isinstance(data, (dict, list)) and data is not None:
+        data = {'data': data}
     abort(status_code, status='fail', data=data)
 
 def error(status_code, message, data=None):
@@ -55,4 +59,6 @@ def error(status_code, message, data=None):
 
     code is currently not used for any errors.
     """
+    if not isinstance(data, (dict, list)) and data is not None:
+        data = {'data': data}
     abort(status_code, status='error', message=message, data=data)

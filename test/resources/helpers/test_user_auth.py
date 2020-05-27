@@ -11,7 +11,7 @@ def test_password(client):
         "email": "passwordmail@test.com",
     }
     data['password'] = 'Password1@'
-    response = client.post("/user", data=json.dumps(data), headers=HEADERS)
+    response = client.post("/users", data=json.dumps(data), headers=HEADERS)
     assert response.status_code == 200
 
 def test_password_whitespace(client):
@@ -20,7 +20,7 @@ def test_password_whitespace(client):
         "email": "passwordmail1@test.com",
     }
     data['password'] = 'Passwo rd1@'
-    response = client.post("/user", data=json.dumps(data), headers=HEADERS)
+    response = client.post("/users", data=json.dumps(data), headers=HEADERS)
     assert response.status_code == 400
 
 def test_password_length(client):
@@ -29,7 +29,7 @@ def test_password_length(client):
         "email": "passwordmail2@test.com",
     }
     data['password'] = 'Pword1@'
-    response = client.post("/user", data=json.dumps(data), headers=HEADERS)
+    response = client.post("/users", data=json.dumps(data), headers=HEADERS)
     assert response.status_code == 400
 
 def test_password_uppercase(client):
@@ -38,7 +38,7 @@ def test_password_uppercase(client):
         "email": "passwordmail3@test.com",
     }
     data['password'] = 'password1@'
-    response = client.post("/user", data=json.dumps(data), headers=HEADERS)
+    response = client.post("/users", data=json.dumps(data), headers=HEADERS)
     assert response.status_code == 400
 
 def test_password_number(client):
@@ -47,7 +47,7 @@ def test_password_number(client):
         "email": "passwordmail4@test.com",
     }
     data['password'] = 'password@'
-    response = client.post("/user", data=json.dumps(data), headers=HEADERS)
+    response = client.post("/users", data=json.dumps(data), headers=HEADERS)
     assert response.status_code == 400
 
 def test_password_symbol(client):
@@ -56,5 +56,5 @@ def test_password_symbol(client):
         "email": "passwordmail5@test.com",
     }
     data['password'] = 'password1'
-    response = client.post("/user", data=json.dumps(data), headers=HEADERS)
+    response = client.post("/users", data=json.dumps(data), headers=HEADERS)
     assert response.status_code == 400

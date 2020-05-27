@@ -8,7 +8,6 @@ from common.response import success, error
 from resources.helpers.confirm import generate_confirmation_token
 from mail import send_email
 from resources.helpers.user_auth import (
-    login_success_response,
     validate_form,
     get_user,
     validate_password_strength,

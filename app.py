@@ -27,9 +27,9 @@ with app.app_context():
     mail.init_app(app)
     db.create_all()
 
-api.add_resource(Users, '/user')
-api.add_resource(User, '/user/<user_id>')
-api.add_resource(Auth, '/auth')
+api.add_resource(Users, '/users')
+api.add_resource(User, '/users/<user_id>')
+api.add_resource(Auth, '/users/auth')
 api.add_resource(ConfirmEmail, '/confirm/<conf_token>')
 
 if __name__ == '__main__':

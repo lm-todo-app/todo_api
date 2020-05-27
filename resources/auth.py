@@ -15,6 +15,9 @@ class Auth(Resource):
         req = request.get_json()
         validate_form_exclude_username(req)
         user = UserModel.query.filter_by(email=req['email']).first()
+        if not user:
+            message = {'user':'User not found'}
+            fail(404, message)
         if not user.confirmed_on:
             message = {'form':'Please confirm email'}
             fail(401, message)
@@ -32,6 +35,9 @@ class ConfirmEmail(Resource):
             message = {'form':'Incorrect email address or password'}
             fail(401, message)
         user = UserModel.query.filter_by(email=email).first_or_404()
+        if not user:
+            message = {'user':'User not found'}
+            fail(404, message)
         if user.confirmed_on:
             message = {'form':'Account already confirmed. Please login.'}
             fail(400, message)
