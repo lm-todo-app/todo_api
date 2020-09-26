@@ -5,9 +5,9 @@ from models.user import User as UserModel
 from models.user import UserSchema
 from database import db, try_commit
 from common.response import success, error
-from resources.helpers.confirm import generate_confirmation_token
+from resources.helpers.confirm_email import generate_confirmation_token
 from mail import send_email
-from resources.helpers.user_auth import (
+from resources.helpers.user import (
     validate_form,
     get_user,
     validate_password_strength,
@@ -15,67 +15,49 @@ from resources.helpers.user_auth import (
     validate_unique_username
 )
 
-class User(Resource):
-    def __init__(self):
-        self.req = None
-        self.user = None
-
-    @jwt_required
-    def get(self, user_id):
-        user = get_user(user_id)
-        user_schema = UserSchema(exclude=['password'])
-        return success(user_schema.dump(user))
-
-    @jwt_required
-    def put(self, user_id):
-        self.req = request.get_json()
-        validate_form(self.req)
-        self.user = get_user(user_id)
-        self._set_updated_user_values()
-        if try_commit():
-            return success()
-        message = {'user': 'Error updating user'}
-        error(500, message)
-
-    def _set_updated_user_values(self):
-        """
-        check that each field is in the response, if they aren't then they don't
-        need to be updated.
-
-        Also check that the username and email that the user wants to update
-        to are not already in use by another user and will throw an error if
-        they are.
-        """
-        if 'username' in self.req:
-            if not validate_unique_username(self.req['username']):
-                self.user.username = self.req['username']
-        if 'email' in self.req:
-            if not validate_unique_email(self.req['email']):
-                self.user.email = self.req['email']
-        if 'password' in self.req:
-            self.user.set_password(self.req['password'])
-
-    @jwt_required
-    def delete(self, user_id):
-        user = get_user(user_id)
-        db.session.delete(user)
-        if try_commit():
-            return success()
-        message = {'user': 'Error deleting user'}
-        error(500, message)
-
-
 class Users(Resource):
+    """
+    API methods that handle the users resource.
+    """
     def __init__(self):
         self.request = None
         self.req = None
         self.user = None
 
     @jwt_required
-    def get(self):
-        users = UserModel.query.all()
-        user_schema = UserSchema(exclude=['password'])
-        return success(user_schema.dump(users, many=True))
+    def get(self, id=None):
+        """
+        If id exists get a single user else get all users.
+        """
+        if id is None:
+            return self._get_users()
+        return self._get_user(id)
+
+    @jwt_required
+    def put(self, id):
+        """
+        Update user.
+        """
+        self.req = request.get_json()
+        validate_form(self.req)
+        self.user = get_user(id)
+        self._set_updated_user_values()
+        if try_commit():
+            return success()
+        message = {'user': 'Error updating user'}
+        error(500, message)
+
+    @jwt_required
+    def delete(self, id):
+        """
+        Delete user.
+        """
+        user = get_user(id)
+        db.session.delete(user)
+        if try_commit():
+            return success()
+        message = {'user': 'Error deleting user'}
+        error(500, message)
 
     def post(self):
         """
@@ -96,6 +78,40 @@ class Users(Resource):
         message = {'user': 'Error creating user'}
         error(500, message)
 
+    def _set_updated_user_values(self):
+        """
+        check that each field is in the response, if they aren't then they don't
+        need to be updated.
+
+        Also check that the username and email that the user wants to update
+        to are not already in use by another user and will throw an error if
+        they are.
+        """
+        if 'username' in self.req:
+            if not validate_unique_username(self.req['username']):
+                self.user.username = self.req['username']
+        if 'email' in self.req:
+            if not validate_unique_email(self.req['email']):
+                self.user.email = self.req['email']
+        if 'password' in self.req:
+            self.user.set_password(self.req['password'])
+
+    def _get_user(self, id):
+        """
+        Get a single user.
+        """
+        user = get_user(id)
+        user_schema = UserSchema(exclude=['password'])
+        return success(user_schema.dump(user))
+
+    def _get_users(self):
+        """
+        Get all users.
+        """
+        users = UserModel.query.all()
+        user_schema = UserSchema(exclude=['password'])
+        return success(user_schema.dump(users, many=True))
+
     def _create_user(self):
         """
         We need to exclude the password from the request as it needs to be
@@ -110,8 +126,13 @@ class Users(Resource):
         self.user.set_password(password)
         db.session.add(self.user)
 
+    # TODO: This should be moved to the confirm helper and used by resource
+    # confirm post method.
+    # Needs url and email params
     def _send_confirmation_email(self):
         """
+        Sends a confirmation email to the user.
+
         Prints the confirmation link to the console for development so we don't
         need an smtp server setup. The send_email function only sends an email
         in production.

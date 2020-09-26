@@ -1,15 +1,7 @@
 import string
-from flask_jwt_extended import create_access_token
 from models.user import User as UserModel
 from models.user import UserSchema
 from common.response import fail
-
-def login_success_response(user):
-    email = user.email
-    access_token = create_access_token(identity=email)
-    user_schema = UserSchema(exclude=['password'])
-    user_json = user_schema.dump(user)
-    return {'user': user_json, 'accessToken': access_token}
 
 def validate_form_exclude_username(req):
     """
@@ -20,10 +12,12 @@ def validate_form_exclude_username(req):
     user_schema = UserSchema(exclude=['username'])
     _validate_schema(req, user_schema)
 
+# TODO: change to validate_user_form, check marshmallow for functionality
 def validate_form(req):
     user_schema = UserSchema()
     _validate_schema(req, user_schema)
 
+# TODO: marshmallow can handle returning errors, test this.
 def _validate_schema(req, schema):
     errors = schema.validate(req)
     if errors:

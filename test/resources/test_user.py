@@ -1,5 +1,5 @@
 import json
-from resources.helpers.confirm import generate_confirmation_token
+from resources.helpers.confirm_email import generate_confirmation_token
 
 TOKEN = ''
 HEADERS = {

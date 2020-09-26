@@ -6,8 +6,10 @@ from flask_migrate import Migrate
 from settings import SECRET, JWT_SECRET, DEV_DB_URI
 from mail import mail
 from database import db, ma
-from resources.user import Users, User
-from resources.auth import Auth, ConfirmEmail
+from resources.user import Users
+from resources.auth import Auth
+from resources.confirm_email import ConfirmEmail
+# TODO: Add password_reset resource.
 
 app = Flask(__name__)
 CORS(app)
@@ -27,8 +29,8 @@ with app.app_context():
     mail.init_app(app)
     db.create_all()
 
-api.add_resource(Users, '/users')
-api.add_resource(User, '/users/<user_id>')
+api.add_resource(Users, '/users', endpoint='users')
+api.add_resource(Users, '/users/<id>', endpoint='user')
 api.add_resource(Auth, '/users/auth')
 api.add_resource(ConfirmEmail, '/confirm/<conf_token>')
 

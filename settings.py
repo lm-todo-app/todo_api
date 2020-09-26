@@ -1,11 +1,11 @@
+"""
+Constants for app.
+"""
 import os
 
 ENVIRONMENT = os.environ['FLASK_ENV']
 
-# For dev set to 'secret'
 SECRET = os.environ['todo_api_secret']
-
-# For dev set to 'secret-key'
 JWT_SECRET = os.environ['todo_api_jwt_secret']
 
 if ENVIRONMENT == 'development':
