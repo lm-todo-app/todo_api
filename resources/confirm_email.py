@@ -10,7 +10,6 @@ class ConfirmEmail(Resource):
     Check if the user has confirmed their email address.
     A user who has not confrimed their email address is not able to login.
     """
-
     def get(self, conf_token):
         """
         Check the token and if the user still exists or has not previously
@@ -34,4 +33,3 @@ class ConfirmEmail(Resource):
 
     #  TODO: post should generate a new confirmation token and accept email
     # address as a value.
-

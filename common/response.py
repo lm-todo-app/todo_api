@@ -1,9 +1,9 @@
-from flask_restful import abort
 """
 The following functions aim to standardise the JSON responses from this API.
 This follows the jsend standard with the exception that a status code will be
 sent with the response.
 """
+from flask_restful import abort
 
 def success(data=None):
     """
@@ -61,4 +61,6 @@ def error(status_code, message, data=None):
     """
     if not isinstance(data, (dict, list)) and data is not None:
         data = {'data': data}
-    abort(status_code, status='error', message=message, data=data)
+    if isinstance(message, dict) and message is not None:
+        abort(status_code, status='error', message=message, data=data)
+    raise ValueError('message must be a dict and cannot be empty')

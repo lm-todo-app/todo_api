@@ -5,8 +5,8 @@ from models.user import User as UserModel
 from models.user import UserSchema
 from database import db, try_commit
 from common.response import success, error
-from resources.helpers.confirm_email import generate_confirmation_token
 from mail import send_email
+from resources.helpers.confirm_email import generate_confirmation_token
 from resources.helpers.user import (
     validate_form,
     get_user,
@@ -25,22 +25,22 @@ class Users(Resource):
         self.user = None
 
     @jwt_required
-    def get(self, id=None):
+    def get(self, user_id=None):
         """
         If id exists get a single user else get all users.
         """
-        if id is None:
+        if user_id is None:
             return self._get_users()
-        return self._get_user(id)
+        return self._get_user(user_id)
 
     @jwt_required
-    def put(self, id):
+    def put(self, user_id):
         """
         Update user.
         """
         self.req = request.get_json()
         validate_form(self.req)
-        self.user = get_user(id)
+        self.user = get_user(user_id)
         self._set_updated_user_values()
         if try_commit():
             return success()
@@ -48,11 +48,11 @@ class Users(Resource):
         error(500, message)
 
     @jwt_required
-    def delete(self, id):
+    def delete(self, user_id):
         """
         Delete user.
         """
-        user = get_user(id)
+        user = get_user(user_id)
         db.session.delete(user)
         if try_commit():
             return success()
@@ -96,11 +96,11 @@ class Users(Resource):
         if 'password' in self.req:
             self.user.set_password(self.req['password'])
 
-    def _get_user(self, id):
+    def _get_user(self, user_id):
         """
         Get a single user.
         """
-        user = get_user(id)
+        user = get_user(user_id)
         user_schema = UserSchema(exclude=['password'])
         return success(user_schema.dump(user))
 

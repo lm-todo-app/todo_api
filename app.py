@@ -30,7 +30,7 @@ with app.app_context():
     db.create_all()
 
 api.add_resource(Users, '/users', endpoint='users')
-api.add_resource(Users, '/users/<id>', endpoint='user')
+api.add_resource(Users, '/users/<user_id>', endpoint='user')
 api.add_resource(Auth, '/users/auth')
 api.add_resource(ConfirmEmail, '/confirm/<conf_token>')
 
