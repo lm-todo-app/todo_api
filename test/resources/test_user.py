@@ -20,7 +20,7 @@ def test_create_user(client):
         "email": "mail@test.com",
         "password": "Testpassword@1"
     }
-    response = client.post("/users/auth", data=json.dumps(data), headers=HEADERS)
+    response = client.post("/login", data=json.dumps(data), headers=HEADERS)
     global TOKEN
     TOKEN = 'Bearer ' + response.json['accessToken']
     assert response.status_code == 200

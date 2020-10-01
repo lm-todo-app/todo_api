@@ -3,9 +3,9 @@ from flask_restful import Resource
 from flask_jwt_extended import create_access_token
 from models.user import User as UserModel, UserSchema
 from common.response import fail
-from resources.helpers.user import validate_form_exclude_username
+from resources.helpers.user import validate_request
 
-class Auth(Resource):
+class Login(Resource):
     """
     Returns a login token if the user is valid.
     """
@@ -15,7 +15,7 @@ class Auth(Resource):
         Check the password and if correct returns an auth token.
         """
         req = request.get_json()
-        validate_form_exclude_username(req)
+        self.validate_form_authn(req)
         user = UserModel.query.filter_by(email=req['email']).first()
         if not user:
             message = {'user':'User not found'}
@@ -34,6 +34,13 @@ class Auth(Resource):
         """
         email = user.email
         access_token = create_access_token(identity=email)
-        user_schema = UserSchema(exclude=['password'])
+        user_schema = UserSchema()
         user = user_schema.dump(user)
         return {'user': user, 'accessToken': access_token}
+
+    def validate_form_authn(self, req):
+        """
+        For auth we only need the email and password to identify a user.
+        """
+        user_schema = UserSchema(only=['email', 'password'])
+        validate_request(req, user_schema)

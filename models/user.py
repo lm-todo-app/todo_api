@@ -35,15 +35,13 @@ class User(db.Model):
 class UserSchema(CamelCaseSchema):
     """
     Schema for user validation with API.
-
     """
     class Meta:
         model = User
         load_instance = True
 
     email = fields.Email(required=True)
-    first_name = fields.Str()
-    last_name = fields.Str()
+    password = fields.Str(load_only=True)
     username = fields.Str(
         validate=validate.Length(min=5, max=100),
         required=True
@@ -53,7 +51,6 @@ class UserSchema(CamelCaseSchema):
     def process_input(self, data, **kwargs):
         """
         Before checking for validation strip whitespace from email and username.
-
         """
         if data.get('email'):
             data["email"] = data["email"].lower().strip()

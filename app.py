@@ -7,7 +7,7 @@ from settings import SECRET, JWT_SECRET, DEV_DB_URI
 from mail import mail
 from database import db, ma
 from resources.user import Users
-from resources.auth import Auth
+from resources.login import Login
 from resources.confirm_email import ConfirmEmail
 # TODO: Add password_reset resource.
 
@@ -31,7 +31,7 @@ with app.app_context():
 
 api.add_resource(Users, '/users', endpoint='users')
 api.add_resource(Users, '/users/<user_id>', endpoint='user')
-api.add_resource(Auth, '/users/auth')
+api.add_resource(Login, '/login')
 api.add_resource(ConfirmEmail, '/confirm/<conf_token>')
 
 if __name__ == '__main__':

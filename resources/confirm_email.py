@@ -32,4 +32,4 @@ class ConfirmEmail(Resource):
         return success({'confirm': 'You have confirmed your account.'})
 
     #  TODO: post should generate a new confirmation token and accept email
-    # address as a value.
+    # address as an argument.
