@@ -1,6 +1,5 @@
 import string
 from models.user import User as UserModel
-from models.user import UserSchema
 from common.response import fail
 
 def validate_request(req, schema):
