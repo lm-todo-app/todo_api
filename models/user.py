@@ -52,6 +52,8 @@ class UserSchema(CamelCaseSchema):
         """
         Before checking for validation strip whitespace from email and username.
         """
+        if not data:
+            return data
         if data.get('email'):
             data["email"] = data["email"].lower().strip()
         if data.get('username'):

@@ -67,11 +67,13 @@ class Users(Resource):
         """
         self.request = request.get_json()
         validate_request(self.request, self.user_schema)
+
         # TODO: Might be able to move this check to pre_load
         # Password is required here but is not required by marshmallow because
         # it is load only so we need to check the field exists here instead.
         if not self.request.get('password'):
             fail(400, {'form':{'password': 'password field is required'}})
+
         validate_unique_email(self.request['email'])
         validate_unique_username(self.request['username'])
         validate_password_strength(self.request['password'])
