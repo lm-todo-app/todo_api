@@ -1,13 +1,18 @@
-from flask import request
+from flask import request, jsonify
 from flask_restful import Resource
-from flask_jwt_extended import create_access_token
 from models.user import User as UserModel, UserSchema
 from common.response import fail
 from resources.helpers.user import validate_request
+from flask_jwt_extended import (
+    create_access_token,
+    create_refresh_token,
+    set_access_cookies,
+    set_refresh_cookies
+)
 
 class Login(Resource):
     """
-    Handle authentication for user.
+    Handle login for user.
     """
     def __init__(self):
         self.user = None
@@ -16,7 +21,7 @@ class Login(Resource):
     def post(self):
         """
         Check if the user exists and if their email has been confirmed.
-        Check the password and if correct returns an auth token.
+        Check the password and if correct returns an auth cookie.
         """
         self.request = request.get_json()
         self.validate_form_authn()
@@ -28,17 +33,22 @@ class Login(Resource):
             message = {'form':'Incorrect email address or password'}
             fail(401, message)
         self.validate_user_email_confirmation()
-        return self._login_success_response(), 200
+        return self._login_success_response()
 
     def _login_success_response(self):
         """
-        Generate a token for the user and return the user info and token.
+        Generate tokens for the user and return the user info with cookies for
+        auth, refresh and csrf.
         """
         email = self.user.email
         access_token = create_access_token(identity=email)
+        refresh_token = create_refresh_token(identity=email)
         user_schema = UserSchema()
         user = user_schema.dump(self.user)
-        return {'user': user, 'accessToken': access_token}
+        resp = jsonify({'user': user})
+        set_access_cookies(resp, access_token)
+        set_refresh_cookies(resp, refresh_token)
+        return resp
 
     def validate_form_authn(self):
         """

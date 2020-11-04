@@ -11,6 +11,7 @@ def client():
     """
     Create a test database and use the flask context to allow requests.
     """
+    app.config['JWT_COOKIE_CSRF_PROTECT'] = False
     app.config['SQLALCHEMY_DATABASE_URI'] = TEST_DB_URI
     with app.test_client() as client:
         with app.app_context():

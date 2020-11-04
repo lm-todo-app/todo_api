@@ -1,6 +1,6 @@
 import pytest
 from resources.helpers.confirm_email import generate_confirmation_token
-from test.fixtures.user import user_token, teardown_user, setup_user
+from test.fixtures.user import login, teardown_user, setup_user
 
 @pytest.mark.usefixtures('teardown_user')
 def test_create_user(client):
@@ -110,45 +110,24 @@ class TestUser:
         assert response.status_code == 400
 
 
-@pytest.mark.usefixtures('setup_user', 'user_token')
+@pytest.mark.usefixtures('setup_user', 'login')
 class TestUserGet:
-    def test_get_user(self, client, user_token):
-        headers = {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'Authorization': user_token
-        }
-        response = client.get("/users/1", headers=headers)
+    def test_get_user(self, client, login):
+        response = client.get("/users/1")
         assert response.status_code == 200
 
-    def test_get_user_does_not_exist(self, client, user_token):
-        headers = {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'Authorization': user_token
-        }
-        response = client.get("/users/100", headers=headers)
+    def test_get_user_does_not_exist(self, client, login):
+        response = client.get("/users/100")
         assert response.status_code == 404
 
-    def test_get_users(self, client, user_token):
-        headers = {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'Authorization': user_token
-        }
-        response = client.get("/users", headers=headers)
+    def test_get_users(self, client, login):
+        response = client.get("/users")
         assert response.status_code == 200
 
-    def test_delete_user_does_not_exist(self, client, user_token):
-        headers = {
-            'Authorization': user_token
-        }
-        response = client.delete("/users/100", headers=headers)
+    def test_delete_user_does_not_exist(self, client, login):
+        response = client.delete("/users/100")
         assert response.status_code == 404
 
-    def test_delete_user(self, client, user_token):
-        headers = {
-            'Authorization': user_token
-        }
-        response = client.delete("/users/1", headers=headers)
+    def test_delete_user(self, client, login):
+        response = client.delete("/users/1")
         assert response.status_code == 200

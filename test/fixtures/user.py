@@ -2,16 +2,16 @@ import pytest
 from resources.helpers.confirm_email import generate_confirmation_token
 from database import db
 from models.user import User as UserModel
+from http.cookies import SimpleCookie
 
 @pytest.fixture
-def user_token(client):
+def login(client):
     data = {
         "email": "mail@test.com",
         "password": "Testpassword@1"
     }
     response = client.post("/login", json=data)
-    token = 'Bearer ' + response.json['accessToken']
-    yield token
+    yield
 
 @pytest.fixture
 def setup_user(client):
