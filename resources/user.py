@@ -52,6 +52,7 @@ class Users(Resource):
         """
         Delete user.
         """
+        # TODO: Need to remove token if user is logged in.
         user = get_user(user_id)
         db.session.delete(user)
         if try_commit():
@@ -79,7 +80,8 @@ class Users(Resource):
         validate_password_strength(self.request['password'])
         self._create_user()
         if try_commit():
-            url = f'{request.url_root}confirm/'
+            # TODO: Move this url to settings.
+            url = f'{request.url_root}api/v1/confirm/'
             self._send_confirmation_email(url)
             return success({'confirm': 'Please confirm email address'})
         message = {'user': 'Error creating user'}

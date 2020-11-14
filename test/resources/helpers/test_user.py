@@ -1,5 +1,6 @@
 import pytest
 from test.fixtures.user import teardown_user
+from test.fixtures.url import USERS_URL
 
 @pytest.mark.usefixtures('teardown_user')
 class TestHelper:
@@ -9,7 +10,7 @@ class TestHelper:
             "email": "passwordmail@test.com",
         }
         data['password'] = 'Password1@'
-        response = client.post("/users", json=data)
+        response = client.post(USERS_URL, json=data)
         assert response.status_code == 200
 
     def test_password_whitespace(self, client):
@@ -18,7 +19,7 @@ class TestHelper:
             "email": "passwordmail1@test.com",
         }
         data['password'] = 'Passwo rd1@'
-        response = client.post("/users", json=data)
+        response = client.post(USERS_URL, json=data)
         assert response.status_code == 400
 
     def test_password_length(self, client):
@@ -27,7 +28,7 @@ class TestHelper:
             "email": "passwordmail2@test.com",
         }
         data['password'] = 'Pword1@'
-        response = client.post("/users", json=data)
+        response = client.post(USERS_URL, json=data)
         assert response.status_code == 400
 
     def test_password_uppercase(self, client):
@@ -36,7 +37,7 @@ class TestHelper:
             "email": "passwordmail3@test.com",
         }
         data['password'] = 'password1@'
-        response = client.post("/users", json=data)
+        response = client.post(USERS_URL, json=data)
         assert response.status_code == 400
 
     def test_password_number(self, client):
@@ -45,7 +46,7 @@ class TestHelper:
             "email": "passwordmail4@test.com",
         }
         data['password'] = 'password@'
-        response = client.post("/users", json=data)
+        response = client.post(USERS_URL, json=data)
         assert response.status_code == 400
 
     def test_password_symbol(self, client):
@@ -54,5 +55,5 @@ class TestHelper:
             "email": "passwordmail5@test.com",
         }
         data['password'] = 'password1'
-        response = client.post("/users", json=data)
+        response = client.post(USERS_URL, json=data)
         assert response.status_code == 400

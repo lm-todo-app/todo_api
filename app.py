@@ -15,15 +15,17 @@ from resources.confirm_email import ConfirmEmail
 # TODO: Add password_reset resource.
 
 app = Flask(__name__)
-CORS(app)
 api = Api(app)
 jwt = JWTManager(app)
 migrate = Migrate(app, db)
+
+v1 = '/api/v1'
 
 app.config['SECRET_KEY'] = SECRET
 app.config['JWT_SECRET_KEY'] = JWT_SECRET
 app.config['JWT_TOKEN_LOCATION'] = ['cookies']
 app.config['JWT_COOKIE_CSRF_PROTECT'] = True
+app.config['JWT_REFRESH_COOKIE_PATH'] = f'{v1}/token/refresh'
 
 app.config['SQLALCHEMY_DATABASE_URI'] = DEV_DB_URI
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -34,13 +36,12 @@ with app.app_context():
     mail.init_app(app)
     db.create_all()
 
-api.add_resource(Users, '/users', endpoint='users')
-api.add_resource(Users, '/users/<user_id>', endpoint='user')
-api.add_resource(Login, '/login')
-api.add_resource(Auth, '/token/auth')
-api.add_resource(Refresh, '/token/refresh')
-api.add_resource(Remove, '/token/remove')
-api.add_resource(ConfirmEmail, '/confirm/<conf_token>')
+api.add_resource(Users, f'{v1}/users', f'{v1}/users/<user_id>')
+api.add_resource(Login, f'{v1}/login')
+api.add_resource(Auth, f'{v1}/token/auth')
+api.add_resource(Refresh, f'{v1}/token/refresh')
+api.add_resource(Remove, f'{v1}/token/remove')
+api.add_resource(ConfirmEmail, f'{v1}/confirm/<conf_token>')
 
 if __name__ == '__main__':
     app.run(debug=True)
