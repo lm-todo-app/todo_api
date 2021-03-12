@@ -3,6 +3,7 @@ from common.confirm_email import generate_confirmation_token
 from tests.fixtures.user import login, teardown_user, setup_user
 from tests.fixtures.url import USERS_URL, CONFIRM_URL, LOGIN_URL
 
+
 @pytest.mark.usefixtures('teardown_user')
 def test_create_user(client):
     data = {

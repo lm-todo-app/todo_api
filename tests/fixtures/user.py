@@ -4,6 +4,7 @@ from database import db
 from models.user import User
 from tests.fixtures.url import USERS_URL, CONFIRM_URL, LOGIN_URL
 
+
 @pytest.fixture
 def login(client):
     data = {

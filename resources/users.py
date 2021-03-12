@@ -25,7 +25,7 @@ class Users(Resource):
         self.user = None
         self.user_schema = UserSchema()
 
-    @jwt_required
+    @jwt_required()
     def get(self, user_id=None):
         """
         If ID exists get a single user else get all users.
@@ -34,7 +34,7 @@ class Users(Resource):
             return self._get_users()
         return self._get_user(user_id)
 
-    @jwt_required
+    @jwt_required()
     def put(self, user_id):
         """
         Update user.
@@ -48,7 +48,7 @@ class Users(Resource):
         message = {'user': 'Error updating user'}
         error(500, message)
 
-    @jwt_required
+    @jwt_required()
     def delete(self, user_id):
         """
         Delete user.

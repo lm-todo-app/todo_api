@@ -2,7 +2,6 @@ from flask import jsonify
 from flask_restful import Resource
 from flask_jwt_extended import (
     jwt_required,
-    jwt_refresh_token_required,
     get_jwt_identity,
     create_access_token,
     set_access_cookies,
@@ -15,7 +14,7 @@ class Auth(Resource):
     """
     Handle authentication for user.
     """
-    @jwt_required
+    @jwt_required()
     def post(self):
         """
         Check if JWT is valid.
@@ -28,7 +27,7 @@ class Refresh(Resource):
     """
     Refresh an access token.
     """
-    @jwt_refresh_token_required
+    @jwt_required(refresh=True)
     def post(self):
         """
         Refresh access tokens without changing refresh tokens.

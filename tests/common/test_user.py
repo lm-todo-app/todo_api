@@ -2,6 +2,7 @@ import pytest
 from tests.fixtures.user import teardown_user
 from tests.fixtures.url import USERS_URL
 
+
 @pytest.mark.usefixtures('teardown_user')
 class TestHelper:
     def test_password(self, client):
