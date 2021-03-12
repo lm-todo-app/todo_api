@@ -1,8 +1,8 @@
 import pytest
-from resources.helpers.confirm_email import generate_confirmation_token
+from common.confirm_email import generate_confirmation_token
 from database import db
-from models.user import User as UserModel
-from test.fixtures.url import USERS_URL, CONFIRM_URL, LOGIN_URL
+from models.user import User
+from tests.fixtures.url import USERS_URL, CONFIRM_URL, LOGIN_URL
 
 @pytest.fixture
 def login(client):
@@ -24,12 +24,12 @@ def setup_user(client):
     conf_token = generate_confirmation_token(data['email'])
     response = client.get(CONFIRM_URL + conf_token)
     yield
-    UserModel.query.delete()
+    User.query.delete()
     db.session.commit()
 
 
 @pytest.fixture
 def teardown_user(client):
     yield
-    UserModel.query.delete()
+    User.query.delete()
     db.session.commit()

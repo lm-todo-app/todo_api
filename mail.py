@@ -4,6 +4,7 @@ Sender for email. Used for sending email confirmations.
 from flask_mail import Mail, Message
 from settings import ENVIRONMENT
 
+
 mail = Mail()
 
 # move to settings

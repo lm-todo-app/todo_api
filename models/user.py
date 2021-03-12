@@ -1,7 +1,7 @@
 from werkzeug.security import generate_password_hash, check_password_hash
 from marshmallow import fields, validate, pre_load
 from database import db
-from models.helpers.case import CamelCaseSchema
+from common.case import CamelCaseSchema
 
 class User(db.Model):
     """

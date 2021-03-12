@@ -1,21 +1,22 @@
 import string
-from models.user import User as UserModel
+from models.user import User
 from common.response import fail
 
-def validate_request(req, schema):
-    errors = schema.validate(req)
+
+def validate_form(form, schema):
+    errors = schema.validate(form)
     if errors:
         message = {'form': errors}
         fail(400, data=message)
 
 def validate_unique_email(email):
-    user = UserModel.query.filter_by(email=email).first()
+    user = User.query.filter_by(email=email).first()
     if user:
         message = {'user': 'User already exists with this email'}
         fail(409, data=message)
 
 def validate_unique_username(username):
-    user = UserModel.query.filter_by(username=username).first()
+    user = User.query.filter_by(username=username).first()
     if user:
         message = {'user': 'User already exists with this username'}
         fail(409, data=message)
@@ -25,7 +26,7 @@ def get_user(user_id):
     Leaving this here instead of moving this to the model because it uses flask
     abort and we don't want the model methods to use that.
     """
-    user = UserModel.query.get(user_id)
+    user = User.query.get(user_id)
     if not user:
         message = {'user': 'User does not exist'}
         fail(404, data=message)

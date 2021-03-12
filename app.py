@@ -1,17 +1,14 @@
 from flask import Flask
 from flask_restful import Api
-from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from flask_migrate import Migrate
 from settings import SECRET, JWT_SECRET, DEV_DB_URI
 from mail import mail
 from database import db, ma
-from resources.user import Users
-from resources.token import Auth
-from resources.token import Refresh
-from resources.token import Remove
-from resources.login import Login
-from resources.confirm_email import ConfirmEmail
+from resources.users import Users
+from resources.token import Auth, Refresh, Remove
+from resources.login import Login, ConfirmEmail
+
 # TODO: Add password_reset resource.
 
 app = Flask(__name__)

@@ -1,6 +1,6 @@
 import pytest
-from test.fixtures.user import teardown_user
-from test.fixtures.url import USERS_URL
+from tests.fixtures.user import teardown_user
+from tests.fixtures.url import USERS_URL
 
 @pytest.mark.usefixtures('teardown_user')
 class TestHelper:

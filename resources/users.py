@@ -1,26 +1,27 @@
 from flask import request
 from flask_restful import Resource
 from flask_jwt_extended import jwt_required
-from models.user import User as UserModel
+from models.user import User
 from models.user import UserSchema
 from database import db, try_commit
-from common.response import success, error, fail
 from mail import send_email
-from resources.helpers.confirm_email import generate_confirmation_token
-from resources.helpers.user import (
-    validate_request,
+from common.response import success, error, fail
+from common.confirm_email import generate_confirmation_token
+from common.user import (
+    validate_form,
     get_user,
     validate_password_strength,
     validate_unique_email,
     validate_unique_username
 )
 
+
 class Users(Resource):
     """
     API methods that handle the users resource.
     """
     def __init__(self):
-        self.request = None
+        self.form = None
         self.user = None
         self.user_schema = UserSchema()
 
@@ -38,8 +39,8 @@ class Users(Resource):
         """
         Update user.
         """
-        self.request = request.get_json()
-        validate_request(self.request, self.user_schema)
+        self.form = request.get_json()
+        validate_form(self.form, self.user_schema)
         self.user = get_user(user_id)
         self._set_updated_user_values()
         if try_commit():
@@ -66,18 +67,18 @@ class Users(Resource):
         user and check the password strength is sufficient as the average user
         will need this check. If this is successful then create the user.
         """
-        self.request = request.get_json()
-        validate_request(self.request, self.user_schema)
+        self.form = request.get_json()
+        validate_form(self.form, self.user_schema)
 
         # TODO: Might be able to move this check to pre_load
         # Password is required here but is not required by marshmallow because
         # it is load only so we need to check the field exists here instead.
-        if not self.request.get('password'):
+        if not self.form.get('password'):
             fail(400, {'form':{'password': 'password field is required'}})
 
-        validate_unique_email(self.request['email'])
-        validate_unique_username(self.request['username'])
-        validate_password_strength(self.request['password'])
+        validate_unique_email(self.form['email'])
+        validate_unique_username(self.form['username'])
+        validate_password_strength(self.form['password'])
         self._create_user()
         if try_commit():
             # TODO: Move this url to settings.
@@ -96,14 +97,14 @@ class Users(Resource):
         to are not already in use by another user and will throw an error if
         they are.
         """
-        if 'username' in self.request:
-            if not validate_unique_username(self.request['username']):
-                self.user.username = self.request['username']
-        if 'email' in self.request:
-            if not validate_unique_email(self.request['email']):
-                self.user.email = self.request['email']
-        if 'password' in self.request:
-            self.user.set_password(self.request['password'])
+        if 'username' in self.form:
+            if not validate_unique_username(self.form['username']):
+                self.user.username = self.form['username']
+        if 'email' in self.form:
+            if not validate_unique_email(self.form['email']):
+                self.user.email = self.form['email']
+        if 'password' in self.form:
+            self.user.set_password(self.form['password'])
 
     def _get_user(self, user_id):
         """
@@ -117,7 +118,7 @@ class Users(Resource):
         """
         Get all users.
         """
-        users = UserModel.query.all()
+        users = User.query.all()
         json_users = self.user_schema.dump(users, many=True)
         return success(json_users)
 
@@ -128,13 +129,13 @@ class Users(Resource):
         marshmallow loads which creates the user model object and then add the
         hashed password to the user object.
         """
-        password = self.request.pop('password')
-        self.user = self.user_schema.load(self.request, session=db.session)
+        password = self.form.pop('password')
+        self.user = self.user_schema.load(self.form, session=db.session)
         self.user.set_password(password)
         db.session.add(self.user)
 
-    # TODO: This should be moved to the confirm helper and used by resource
-    # confirm post method.
+    # TODO: This should be moved to the common confirm email and used by
+    # resource confirm post method.
     # Needs url and email params
     def _send_confirmation_email(self, url):
         """

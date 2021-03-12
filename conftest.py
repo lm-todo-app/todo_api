@@ -6,6 +6,7 @@ from app import app
 from database import db
 from settings import TEST_DB_URI
 
+
 @pytest.fixture
 def client():
     """

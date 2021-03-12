@@ -3,6 +3,7 @@ Constants for app.
 """
 import os
 
+
 ENVIRONMENT = os.environ['FLASK_ENV']
 
 SECRET = os.environ['todo_api_secret']

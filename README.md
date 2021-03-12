@@ -15,7 +15,7 @@ Prerequisites:
 Clone repo and then run the following:
 
     pyenv install 3.8.1
-    pipenv --python 3.8.1 install --dev
+    pipenv --python 3.8.1 sync --dev
 
 If you have direnv installed run:
 
@@ -48,10 +48,17 @@ Flask migrations need to be reviewed as they are not always correct.
 
 To run tests:
 
-    ./scripts/test.sh
+    pytest
 
 This can be run on change/save using [entr](http://eradman.com/entrproject/) with:
 
-    ls | entr ./scripts/test.sh
+    ls | entr pytest
 
+To run tests with coverage:
+
+    pytest --cov .
+
+To run pylint:
+
+    pylint ./*
 ---

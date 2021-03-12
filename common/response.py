@@ -5,6 +5,7 @@ sent with the response.
 """
 from flask_restful import abort
 
+
 def success(data=None):
     """
     When an API call is successful, the JSend object is used as a simple
@@ -19,10 +20,7 @@ def success(data=None):
     """
     if not isinstance(data, (dict, list)) and data is not None:
         data = {'data': data}
-    return {
-        'status': 'success',
-        'data': data
-    }
+    return {'status': 'success', 'data': data}
 
 def fail(status_code, data=None):
     """

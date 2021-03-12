@@ -5,6 +5,7 @@ their email.
 from settings import SECRET
 from itsdangerous import URLSafeTimedSerializer
 
+
 SALT = 'salt'
 #  SALT = app.config['SECURITY_PASSWORD_SALT']
 
