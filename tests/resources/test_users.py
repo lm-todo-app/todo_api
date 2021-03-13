@@ -1,7 +1,11 @@
 import pytest
 from common.confirm_email import generate_confirmation_token
-from tests.fixtures.user import login, teardown_user, setup_user
-from tests.fixtures.url import USERS_URL, CONFIRM_URL, LOGIN_URL
+from tests.fixtures.user import login
+from tests.fixtures.user import teardown_user
+from tests.fixtures.user import setup_user
+from tests.fixtures.url import USERS_URL
+from tests.fixtures.url import CONFIRM_URL
+from tests.fixtures.url import LOGIN_URL
 
 
 @pytest.mark.usefixtures('teardown_user')

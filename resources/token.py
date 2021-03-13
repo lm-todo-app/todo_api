@@ -1,12 +1,10 @@
 from flask import jsonify
 from flask_restful import Resource
-from flask_jwt_extended import (
-    jwt_required,
-    get_jwt_identity,
-    create_access_token,
-    set_access_cookies,
-    unset_jwt_cookies
-)
+from flask_jwt_extended import jwt_required
+from flask_jwt_extended import get_jwt_identity
+from flask_jwt_extended import create_access_token
+from flask_jwt_extended import set_access_cookies
+from flask_jwt_extended import unset_jwt_cookies
 
 # TODO: Unit tests.
 

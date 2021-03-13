@@ -1,5 +1,8 @@
-from werkzeug.security import generate_password_hash, check_password_hash
-from marshmallow import fields, validate, pre_load
+from werkzeug.security import generate_password_hash
+from werkzeug.security import check_password_hash
+from marshmallow import fields
+from marshmallow import validate
+from marshmallow import pre_load
 from database import db
 from common.case import CamelCaseSchema
 

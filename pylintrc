@@ -14,7 +14,8 @@ ignore=CVS,
         pylintrc,
         tests,
         pytest.ini,
-        README.md
+        README.md,
+        bandit.yml
 
 # Add files or directories matching the regex patterns to the blacklist. The
 # regex matches against base names, not paths.

@@ -3,17 +3,18 @@ from flask_restful import Resource
 from flask_jwt_extended import jwt_required
 from models.user import User
 from models.user import UserSchema
-from database import db, try_commit
+from database import db
+from database import try_commit
 from common.confirm_email import send_confirmation_email
-from common.response import success, error, fail
+from common.response import success
+from common.response import error
+from common.response import fail
 from common.confirm_email import generate_confirmation_token
-from common.user import (
-    validate_form,
-    get_user,
-    validate_password_strength,
-    validate_unique_email,
-    validate_unique_username
-)
+from common.user import validate_form
+from common.user import get_user
+from common.user import validate_password_strength
+from common.user import validate_unique_email
+from common.user import validate_unique_username
 
 
 class Users(Resource):

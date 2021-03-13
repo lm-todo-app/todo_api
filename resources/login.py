@@ -1,17 +1,18 @@
 from datetime import datetime
-from flask import request, jsonify
+from flask import request
+from flask import jsonify
 from flask_restful import Resource
-from models.user import User, UserSchema
-from common.response import fail, success
+from flask_jwt_extended import create_access_token
+from flask_jwt_extended import create_refresh_token
+from flask_jwt_extended import set_access_cookies
+from flask_jwt_extended import set_refresh_cookies
 from database import db
-from common.user import validate_form
+from models.user import User
+from models.user import UserSchema
 from common.confirm_email import confirm_token
-from flask_jwt_extended import (
-    create_access_token,
-    create_refresh_token,
-    set_access_cookies,
-    set_refresh_cookies
-)
+from common.user import validate_form
+from common.response import fail
+from common.response import success
 
 
 class Login(Resource):
