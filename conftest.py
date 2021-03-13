@@ -14,7 +14,7 @@ def client():
     """
     app.config['JWT_COOKIE_CSRF_PROTECT'] = False
     app.config['SQLALCHEMY_DATABASE_URI'] = TEST_DB_URI
-    with app.test_client() as client:
+    with app.test_client() as client: # pylint: disable=redefined-outer-name
         with app.app_context():
             db.create_all()
             yield client

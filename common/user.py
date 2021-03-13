@@ -57,6 +57,7 @@ def _check_whitespace(password):
     """
     if ' ' in password:
         return 'whitespace is not allowed'
+    return None
 
 def _check_length(password):
     """
@@ -64,6 +65,7 @@ def _check_length(password):
     """
     if len(password) < 8:
         return 'must be 8 characters in length'
+    return None
 
 def _check_uppercase(password):
     """
@@ -71,6 +73,7 @@ def _check_uppercase(password):
     """
     if not any(char.isupper() for char in password):
         return 'must contain at least one uppercase letter'
+    return None
 
 def _check_number(password):
     """
@@ -78,6 +81,7 @@ def _check_number(password):
     """
     if not any(char.isdigit() for char in password):
         return 'must contain at least one number'
+    return None
 
 def _check_special_char(password):
     """
@@ -86,3 +90,4 @@ def _check_special_char(password):
     special_characters = string.punctuation
     if not any(char in special_characters for char in password):
         return 'must contain at least one symbol'
+    return None
