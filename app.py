@@ -13,7 +13,7 @@ from resources.token import Refresh
 from resources.token import Remove
 from resources.login import Login
 from resources.login import ConfirmEmail
-from scripts.users import users_script_bp
+from scripts.users import users_scripts
 
 # TODO: Add password_reset resource.
 
@@ -22,7 +22,7 @@ api = Api(app)
 jwt = JWTManager(app)
 migrate = Migrate(app, db)
 
-app.register_blueprint(users_script_bp)
+app.register_blueprint(users_scripts)
 
 v1 = '/api/v1'
 

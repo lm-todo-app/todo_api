@@ -2,9 +2,9 @@ import click
 from flask import Blueprint
 
 
-users_script_bp = Blueprint('users', __name__)
+users_scripts = Blueprint('users', __name__)
 
-@users_script_bp.cli.command("create")
+@users_scripts.cli.command("create")
 @click.argument("name")
 def create(name):
     """
