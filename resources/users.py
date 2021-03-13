@@ -1,6 +1,9 @@
 from flask import request
+from flask import jsonify
 from flask_restful import Resource
 from flask_jwt_extended import jwt_required
+from flask_jwt_extended import get_jwt_identity
+from flask_jwt_extended import unset_jwt_cookies
 from flasgger import swag_from
 from models.user import User
 from models.user import UserSchema
@@ -39,6 +42,7 @@ class Users(Resource):
             return self._get_users()
         return self._get_user(user_id)
 
+    # TODO: Write tests for updating fields
     @jwt_required()
     @swag_from(f'{apidoc_dir}/put.yml', endpoint='user')
     def put(self, user_id):
@@ -60,13 +64,25 @@ class Users(Resource):
         """
         Delete user.
         """
-        # TODO: Need to remove token if user is logged in.
-        user = get_user(user_id)
-        db.session.delete(user)
+        self.user = get_user(user_id)
+        caller_email = get_jwt_identity()
+        db.session.delete(self.user)
         if try_commit():
-            return success()
+            return self._logout_user_if_caller_account(caller_email)
         message = {'user': 'Error deleting user'}
         error(500, message)
+
+    # TODO: Write a test for this scenario - user deleting their own account
+    def _logout_user_if_caller_account(self, caller_email):
+        """
+        If the user deletes their account then this removes the users access
+        tokens logging them out. Always returns a normal success response.
+        """
+        resp = jsonify(success())
+        if self.user.email == caller_email:
+            unset_jwt_cookies(resp)
+        return resp
+
 
     @swag_from(f'{apidoc_dir}/post.yml', endpoint='users')
     def post(self):
@@ -104,14 +120,20 @@ class Users(Resource):
         to are not already in use by another user and will throw an error if
         they are.
         """
-        if 'username' in self.form:
-            if not validate_unique_username(self.form['username']):
-                self.user.username = self.form['username']
-        if 'email' in self.form:
-            if not validate_unique_email(self.form['email']):
-                self.user.email = self.form['email']
-        if 'password' in self.form:
-            self.user.set_password(self.form['password'])
+        username = self.form.get('username')
+        if username and self.user.username != username:
+            if not validate_unique_username(username):
+                self.user.username = username
+
+        email = self.form.get('email')
+        if email and self.user.email != email:
+            if not validate_unique_email(email):
+                self.user.email = email
+
+        password = self.form.get('password')
+        if password:
+            validate_password_strength(password)
+            self.user.set_password(password)
 
     def _get_user(self, user_id):
         """
