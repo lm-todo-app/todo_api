@@ -1,0 +1,24 @@
+parameters:
+  - name: user_id
+    in: path
+    type: int
+
+definitions:
+  User:
+    type: Object
+    properties:
+      - username:
+        type: string
+      - email:
+        type: string
+      - first_name:
+        type: string
+      - last_name:
+        type: string
+      - confirmed_on:
+        type: date
+
+responses:
+  200:
+    description: Returns user or users
+

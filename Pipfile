@@ -21,6 +21,7 @@ flask-jwt-extended = "*"
 flask-migrate = "*"
 click = "*"
 sendgrid = "*"
+flasgger = "*"
 
 [requires]
 python_version = "3.8"

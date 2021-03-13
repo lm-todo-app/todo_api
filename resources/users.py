@@ -1,6 +1,7 @@
 from flask import request
 from flask_restful import Resource
 from flask_jwt_extended import jwt_required
+from flasgger import swag_from
 from models.user import User
 from models.user import UserSchema
 from database import db
@@ -17,6 +18,8 @@ from common.user import validate_unique_email
 from common.user import validate_unique_username
 
 
+apidoc_dir = '../apidocs/users'
+
 class Users(Resource):
     """
     API methods that handle the users resource.
@@ -27,6 +30,7 @@ class Users(Resource):
         self.user_schema = UserSchema()
 
     @jwt_required()
+    @swag_from(f'{apidoc_dir}/get.yml')
     def get(self, user_id=None):
         """
         If ID exists get a single user else get all users.
@@ -36,6 +40,7 @@ class Users(Resource):
         return self._get_user(user_id)
 
     @jwt_required()
+    @swag_from(f'{apidoc_dir}/put.yml', endpoint='user')
     def put(self, user_id):
         """
         Update user.
@@ -50,6 +55,7 @@ class Users(Resource):
         error(500, message)
 
     @jwt_required()
+    @swag_from(f'{apidoc_dir}/delete.yml', endpoint='user')
     def delete(self, user_id):
         """
         Delete user.
@@ -62,6 +68,7 @@ class Users(Resource):
         message = {'user': 'Error deleting user'}
         error(500, message)
 
+    @swag_from(f'{apidoc_dir}/post.yml', endpoint='users')
     def post(self):
         """
         Check that the username, and email are not already in use by another

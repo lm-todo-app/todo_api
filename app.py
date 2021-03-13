@@ -14,6 +14,7 @@ from resources.token import Remove
 from resources.login import Login
 from resources.login import ConfirmEmail
 from scripts.users import users_scripts
+from flasgger import Swagger
 
 # TODO: Add password_reset resource.
 
@@ -21,6 +22,8 @@ app = Flask(__name__)
 api = Api(app)
 jwt = JWTManager(app)
 migrate = Migrate(app, db)
+# TODO: add docs
+swagger = Swagger(app)
 
 app.register_blueprint(users_scripts)
 
@@ -40,7 +43,8 @@ with app.app_context():
     ma.init_app(app)
     db.create_all()
 
-api.add_resource(Users, f'{v1}/users', f'{v1}/users/<user_id>')
+api.add_resource(Users, f'{v1}/users', endpoint="users")
+api.add_resource(Users, f'{v1}/users/<user_id>', endpoint="user")
 api.add_resource(Login, f'{v1}/login')
 api.add_resource(Auth, f'{v1}/token/auth')
 api.add_resource(Refresh, f'{v1}/token/refresh')

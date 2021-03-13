@@ -1,0 +1,25 @@
+parameters:
+  - name: user_id
+    in: path
+    type: int
+    required: true
+
+definitions:
+  User:
+    type: Object
+    properties:
+      - username:
+        type: string
+      - email:
+        type: string
+      - first_name:
+        type: string
+      - last_name:
+        type: string
+      - confirmed_on:
+        type: date
+
+responses:
+  200:
+    description: Creates a user
+

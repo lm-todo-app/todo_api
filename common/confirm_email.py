@@ -57,7 +57,7 @@ def _create_email_confirmation_message(contact, confirmation_token):
     """
     confirmation_template = 'd-c337569b20124d6b8ba0504c7e54d481'
     template_data = {
-        'subject': "Please confirm your email address",
+        'subject': 'Please confirm your email address',
         'confirmation_url': f'{APP_URL}/verify/{confirmation_token}'
     }
     message = Message(contact, confirmation_template, template_data)

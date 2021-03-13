@@ -1,2 +1,2 @@
 [run]
-omit = test/*, settings.py
+omit = tests/*, settings.py, apidocs/*
