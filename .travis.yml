@@ -4,7 +4,7 @@ install: pipenv sync --dev
 script: pytest --cov .
 after_success: coveralls
 env:
-  - FLASK_ENV=development todo_api_secret=secret todo_api_jwt_secret=secret-key, SENDGRID_SENDER=SENDGRID_SENDER, SENDGRID_API_KEY=SENDGRID_API_KEY, SALT=SALT, APP_URL=TODO_APP_URL, API_URL=API_URL
+  - FLASK_ENV=development todo_api_secret=secret todo_api_jwt_secret=secret-key, SENDGRID_SENDER=SENDGRID_SENDER, SENDGRID_API_KEY=SENDGRID_API_KEY, SALT=SALT, TODO_APP_URL=APP_URL, API_URL=API_URL
 notifications:
   webhooks:
     urls:
