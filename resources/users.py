@@ -4,7 +4,7 @@ from flask_jwt_extended import jwt_required
 from models.user import User
 from models.user import UserSchema
 from database import db, try_commit
-from mail import send_email
+from common.confirm_email import send_confirmation_email
 from common.response import success, error, fail
 from common.confirm_email import generate_confirmation_token
 from common.user import (
@@ -81,9 +81,8 @@ class Users(Resource):
         validate_password_strength(self.form['password'])
         self._create_user()
         if try_commit():
-            # TODO: Move this url to settings.
-            url = f'{request.url_root}api/v1/confirm/'
-            self._send_confirmation_email(url)
+            token = generate_confirmation_token(self.user.email)
+            send_confirmation_email(self.user.email, token)
             return success({'confirm': 'Please confirm email address'})
         message = {'user': 'Error creating user'}
         error(500, message)
@@ -133,20 +132,3 @@ class Users(Resource):
         self.user = self.user_schema.load(self.form, session=db.session)
         self.user.set_password(password)
         db.session.add(self.user)
-
-    # TODO: This should be moved to the common confirm email and used by
-    # resource confirm post method.
-    # Needs url and email params
-    def _send_confirmation_email(self, url):
-        """
-        Sends a confirmation email to the user.
-
-        Prints the confirmation link to the console for development so we don't
-        need an smtp server setup. The send_email function only sends an email
-        in production.
-        """
-        token = generate_confirmation_token(self.user.email)
-        confirm_url = url + token
-        print('\nConfirm URL:')
-        print(confirm_url + '\n')
-        send_email(self.user.email, 'confirm email', 'confirmation_email.html')

@@ -3,11 +3,11 @@ from flask_restful import Api
 from flask_jwt_extended import JWTManager
 from flask_migrate import Migrate
 from settings import SECRET, JWT_SECRET, DEV_DB_URI
-from mail import mail
 from database import db, ma
 from resources.users import Users
 from resources.token import Auth, Refresh, Remove
 from resources.login import Login, ConfirmEmail
+from scripts.users import users_script_bp
 
 # TODO: Add password_reset resource.
 
@@ -15,6 +15,8 @@ app = Flask(__name__)
 api = Api(app)
 jwt = JWTManager(app)
 migrate = Migrate(app, db)
+
+app.register_blueprint(users_script_bp)
 
 v1 = '/api/v1'
 
@@ -30,7 +32,6 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 with app.app_context():
     db.init_app(app)
     ma.init_app(app)
-    mail.init_app(app)
     db.create_all()
 
 api.add_resource(Users, f'{v1}/users', f'{v1}/users/<user_id>')

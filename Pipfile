@@ -9,6 +9,7 @@ pytest = "*"
 pytest-cov = "*"
 pylint-flask = "*"
 coveralls = "*"
+bandit = "*"
 
 [packages]
 flask = "*"
@@ -18,7 +19,8 @@ flask-marshmallow = "*"
 marshmallow-sqlalchemy = "*"
 flask-jwt-extended = "*"
 flask-migrate = "*"
-flask-mail = "*"
+click = "*"
+sendgrid = "*"
 
 [requires]
 python_version = "3.8"
