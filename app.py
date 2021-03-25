@@ -25,6 +25,7 @@ migrate = Migrate(app, db)
 # TODO: add docs
 swagger = Swagger(app)
 
+# Blueprints
 app.register_blueprint(users_scripts)
 
 v1 = '/api/v1'
@@ -34,7 +35,6 @@ app.config['JWT_SECRET_KEY'] = JWT_SECRET
 app.config['JWT_TOKEN_LOCATION'] = ['cookies']
 app.config['JWT_COOKIE_CSRF_PROTECT'] = True
 app.config['JWT_REFRESH_COOKIE_PATH'] = f'{v1}/token/refresh'
-
 app.config['SQLALCHEMY_DATABASE_URI'] = DEV_DB_URI
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 

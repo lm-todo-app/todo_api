@@ -55,6 +55,13 @@ def _create_email_confirmation_message(contact, confirmation_token):
     """
     Confirmation template and data for the dynamic template stored in sendgrid.
     """
+    # TODO: Add to a sendgrid message class:
+    # self.confirmation_template = 'd-c337569b20124d6b8ba0504c7e54d481'
+    # self.template_data = {
+    #     'subject': 'Please confirm your email address',
+    #     'confirmation_url': f'{APP_URL}/verify/{confirmation_token}'
+    # }
+
     confirmation_template = 'd-c337569b20124d6b8ba0504c7e54d481'
     template_data = {
         'subject': 'Please confirm your email address',

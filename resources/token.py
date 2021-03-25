@@ -6,7 +6,6 @@ from flask_jwt_extended import create_access_token
 from flask_jwt_extended import set_access_cookies
 from flask_jwt_extended import unset_jwt_cookies
 
-# TODO: Unit tests.
 
 class Auth(Resource):
     """
