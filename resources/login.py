@@ -81,10 +81,7 @@ def _login_success_response(user):
     access_token = create_access_token(identity=email)
     refresh_token = create_refresh_token(identity=email)
     user_schema = UserSchema()
-    # user = user_schema.dump(self.user)
     resp = jsonify({'user': user_schema.dump(user)})
     set_access_cookies(resp, access_token)
     set_refresh_cookies(resp, refresh_token)
     return resp
-
-

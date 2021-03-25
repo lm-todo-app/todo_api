@@ -15,7 +15,6 @@ from database import try_commit
 from common.confirm_email import send_confirmation_email
 from common.response import success
 from common.response import error
-from common.response import fail
 from common.confirm_email import generate_confirmation_token
 
 

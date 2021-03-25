@@ -54,7 +54,7 @@ class UserSchema(BaseSchema):
     )
 
     @pre_load
-    def process_input(self, data, **kwargs):
+    def process_input(self, data, **kwargs): # pylint: disable=unused-argument
         """
         Before checking for validation strip whitespace from email and username.
         """

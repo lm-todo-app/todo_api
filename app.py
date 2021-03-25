@@ -2,6 +2,7 @@ from flask import Flask
 from flask_restful import Api
 from flask_jwt_extended import JWTManager
 from flask_migrate import Migrate
+from flasgger import Swagger
 from settings import SECRET
 from settings import JWT_SECRET
 from settings import DEV_DB_URI
@@ -14,7 +15,6 @@ from resources.token import Remove
 from resources.login import Login
 from resources.login import ConfirmEmail
 from scripts.users import users_scripts
-from flasgger import Swagger
 
 # TODO: Add password_reset resource.
 
