@@ -1,12 +1,12 @@
 import click
-from flask import Blueprint
+from flask.cli import AppGroup
 
 
-users_scripts = Blueprint('users', __name__)
+users_cli = AppGroup('users')
 
-@users_scripts.cli.command("create")
-@click.argument("name")
-def create(name):
+@users_cli.command('create')
+@click.argument('name')
+def create_user(name):
     """
     Run: 'flask users create $name'
     Create a user, skip email confirmation.

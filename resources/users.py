@@ -45,7 +45,7 @@ class Users(Resource):
         user_schema = UserSchema()
         form = user_schema.validate_or_400(request.get_json())
         user = User.query.get_or_404(user_id)
-        updated_user = set_updated_user_values(user, form)
+        set_updated_user_values(user, form)
         if try_commit():
             return success()
         message = {'user': 'Error updating user'}
@@ -89,7 +89,8 @@ def _get_user(user_id):
     Get a single user.
     """
     user_schema = UserSchema()
-    user = User.query.get_or_404(user_id) # CHECK 404 ERROR MESSAGE
+    # TODO: Error message just says url not found. Might want to say missing user.
+    user = User.query.get_or_404(user_id)
     json_user = user_schema.dump(user)
     return success(json_user)
 

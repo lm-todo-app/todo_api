@@ -14,7 +14,7 @@ from resources.token import Refresh
 from resources.token import Remove
 from resources.login import Login
 from resources.login import ConfirmEmail
-from scripts.users import users_scripts
+from scripts.users import users_cli
 
 # TODO: Add password_reset resource.
 
@@ -25,8 +25,8 @@ migrate = Migrate(app, db)
 # TODO: add docs
 swagger = Swagger(app)
 
-# Blueprints
-app.register_blueprint(users_scripts)
+# cli
+app.cli.add_command(users_cli)
 
 v1 = '/api/v1'
 
