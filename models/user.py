@@ -67,6 +67,9 @@ class UserSchema(BaseSchema):
         return data
 
 
+def delete_user(user):
+    db.session.delete(user)
+
 def create_user(form):
     """
     We need to exclude the password from the request as it needs to be

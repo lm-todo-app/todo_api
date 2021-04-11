@@ -8,9 +8,9 @@ from flasgger import swag_from
 from models.user import User
 from models.user import UserSchema
 from models.user import create_user
+from models.user import delete_user
 from models.user import set_updated_user_values
 from models.user import validate_create_user_form
-from database import db
 from database import try_commit
 from common.confirm_email import send_confirmation_email
 from common.response import success
@@ -18,54 +18,20 @@ from common.response import error
 from common.confirm_email import generate_confirmation_token
 
 
-apidoc_dir = '../apidocs/users'
-
-class Users(Resource):
+class UsersResouce(Resource):
     """
     API methods that handle the users resource.
     """
-    @jwt_required()
+    apidoc_dir = '../apidocs/users'
+
     @swag_from(f'{apidoc_dir}/get.yml')
-    def get(self, user_id=None):
-        """
-        If ID exists get a single user else get all users.
-        """
-        if user_id is None:
-            return _get_users()
-        return _get_user(user_id)
-
-    # TODO: Write tests for updating fields
-    # TODO: Check what fields are optional
-    @jwt_required()
-    @swag_from(f'{apidoc_dir}/put.yml', endpoint='user')
-    def put(self, user_id):
-        """
-        Update user.
-        """
+    def get(self):
         user_schema = UserSchema()
-        form = user_schema.validate_or_400(request.get_json())
-        user = User.query.get_or_404(user_id)
-        set_updated_user_values(user, form)
-        if try_commit():
-            return success()
-        message = {'user': 'Error updating user'}
-        error(500, message)
+        users = User.query.all()
+        json_users = user_schema.dump(users, many=True)
+        return success(json_users)
 
-    @jwt_required()
-    @swag_from(f'{apidoc_dir}/delete.yml', endpoint='user')
-    def delete(self, user_id):
-        """
-        Delete user.
-        """
-        user = User.query.get_or_404(user_id)
-        caller_email = get_jwt_identity()
-        db.session.delete(user)
-        if try_commit():
-            return _logout_user_if_caller_account(caller_email, user)
-        message = {'user': 'Error deleting user'}
-        error(500, message)
-
-    @swag_from(f'{apidoc_dir}/post.yml', endpoint='users')
+    @swag_from(f'{apidoc_dir}/post.yml')
     def post(self):
         """
         Check that the username, and email are not already in use by another
@@ -84,24 +50,55 @@ class Users(Resource):
         error(500, message)
 
 
-def _get_user(user_id):
+class UserResource(Resource):
     """
-    Get a single user.
+    API methods that handle the user resource.
     """
-    user_schema = UserSchema()
-    # TODO: Error message just says url not found. Might want to say missing user.
-    user = User.query.get_or_404(user_id)
-    json_user = user_schema.dump(user)
-    return success(json_user)
+    apidoc_dir = '../apidocs/user'
 
-def _get_users():
-    """
-    Get all users.
-    """
-    user_schema = UserSchema()
-    users = User.query.all()
-    json_users = user_schema.dump(users, many=True)
-    return success(json_users)
+    @jwt_required()
+    @swag_from(f'{apidoc_dir}/get.yml')
+    def get(self, user_id):
+        """
+        If ID exists get a single user else get all users.
+        """
+        user_schema = UserSchema()
+        # TODO: Error message just says url not found. Might want to say missing user.
+        user = User.query.get_or_404(user_id)
+        json_user = user_schema.dump(user)
+        return success(json_user)
+
+    # TODO: Write tests for updating fields
+    # TODO: Check what fields are optional
+    @jwt_required()
+    @swag_from(f'{apidoc_dir}/put.yml')
+    def put(self, user_id):
+        """
+        Update user.
+        """
+        user_schema = UserSchema()
+        form = user_schema.validate_or_400(request.get_json())
+        user = User.query.get_or_404(user_id)
+        set_updated_user_values(user, form)
+        if try_commit():
+            return success()
+        message = {'user': 'Error updating user'}
+        error(500, message)
+
+    @jwt_required()
+    @swag_from(f'{apidoc_dir}/delete.yml')
+    def delete(self, user_id):
+        """
+        Delete user.
+        """
+        user = User.query.get_or_404(user_id)
+        caller_email = get_jwt_identity()
+        delete_user(user)
+        if try_commit():
+            return _logout_user_if_caller_account(caller_email, user)
+        message = {'user': 'Error deleting user'}
+        error(500, message)
+
 
 # TODO: Write a test for this scenario - user deleting their own account
 def _logout_user_if_caller_account(caller_email, user):

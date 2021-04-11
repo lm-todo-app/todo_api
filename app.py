@@ -8,12 +8,9 @@ from settings import JWT_SECRET
 from settings import DEV_DB_URI
 from database import db
 from database import ma
-from resources.users import Users
-from resources.token import Auth
-from resources.token import Refresh
-from resources.token import Remove
-from resources.login import Login
-from resources.login import ConfirmEmail
+from resources import users
+from resources import token
+from resources import login
 from scripts.users import users_cli
 
 # TODO: Add password_reset resource.
@@ -43,13 +40,13 @@ with app.app_context():
     ma.init_app(app)
     db.create_all()
 
-api.add_resource(Users, f'{v1}/users', endpoint="users")
-api.add_resource(Users, f'{v1}/users/<user_id>', endpoint="user")
-api.add_resource(Login, f'{v1}/login')
-api.add_resource(Auth, f'{v1}/token/auth')
-api.add_resource(Refresh, f'{v1}/token/refresh')
-api.add_resource(Remove, f'{v1}/token/remove')
-api.add_resource(ConfirmEmail, f'{v1}/confirm/<conf_token>')
+api.add_resource(users.UsersResouce, f'{v1}/users')
+api.add_resource(users.UserResource, f'{v1}/users/<user_id>')
+api.add_resource(login.Login, f'{v1}/login')
+api.add_resource(token.Auth, f'{v1}/token/auth')
+api.add_resource(token.Refresh, f'{v1}/token/refresh')
+api.add_resource(token.Remove, f'{v1}/token/remove')
+api.add_resource(login.ConfirmEmail, f'{v1}/confirm/<conf_token>')
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -23,3 +23,5 @@ responses:
     description: Returns user or users.
   401:
     description: Authorization information is missing or invalid.
+  404:
+    description: User not found.
