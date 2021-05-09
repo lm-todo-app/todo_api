@@ -22,6 +22,7 @@ flask-migrate = "*"
 click = "*"
 sendgrid = "*"
 flasgger = "*"
+apispec = "*"
 
 [requires]
 python_version = "3.8"

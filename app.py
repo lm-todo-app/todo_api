@@ -19,11 +19,12 @@ app = Flask(__name__)
 api = Api(app)
 jwt = JWTManager(app)
 migrate = Migrate(app, db)
-# TODO: add docs
-swagger = Swagger(app)
 
 # cli
 app.cli.add_command(users_cli)
+
+# apidocs
+docs = Swagger(app)
 
 v1 = '/api/v1'
 
@@ -40,7 +41,7 @@ with app.app_context():
     ma.init_app(app)
     db.create_all()
 
-api.add_resource(users.UsersResouce, f'{v1}/users')
+api.add_resource(users.UsersResource, f'{v1}/users')
 api.add_resource(users.UserResource, f'{v1}/users/<user_id>')
 api.add_resource(login.Login, f'{v1}/login')
 api.add_resource(token.Auth, f'{v1}/token/auth')
@@ -49,4 +50,5 @@ api.add_resource(token.Remove, f'{v1}/token/remove')
 api.add_resource(login.ConfirmEmail, f'{v1}/confirm/<conf_token>')
 
 if __name__ == '__main__':
+    print(app.url_map)
     app.run(debug=True)
