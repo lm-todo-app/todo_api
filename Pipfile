@@ -23,6 +23,8 @@ click = "*"
 sendgrid = "*"
 flasgger = "*"
 apispec = "*"
+mysqlclient = "*"
+sqlalchemy-utils = "*"
 
 [requires]
 python_version = "3.8"

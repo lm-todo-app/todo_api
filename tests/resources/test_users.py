@@ -184,3 +184,30 @@ class TestUserGet:
         }
         response = client.post(LOGIN_URL, json=data)
         assert response.status_code == 200
+
+    def test_get_user_me(self, client, login):
+        response = client.get(f'{USERS_URL}/me')
+        assert response.status_code == 200
+        assert response.json['data']['id'] == 1
+
+    def test_update_user_me(self, client, login):
+        data = {
+            "username": "updated user",
+            "email": "mail@test.com",
+        }
+        response = client.put(f'{USERS_URL}/me', json=data)
+        assert response.status_code == 200
+        assert response.json['data']['id'] == 1
+        assert response.json['data']['username'] == 'updated user'
+
+    def test_delete_user_me(self, client, login):
+        response = client.delete(f'{USERS_URL}/me')
+        assert response.status_code == 200
+        response = client.get(f'{USERS_URL}')
+        assert response.status_code == 401
+        data = {
+            "email": "mail@test.com",
+            "password": "Testpassword@1"
+        }
+        response = client.post(LOGIN_URL, json=data)
+        assert response.status_code == 401

@@ -25,8 +25,9 @@ SALT = 'salt'
 
 if ENVIRONMENT == 'development':
     DEV_DB_URI = 'sqlite:////tmp/todo_dev.db'
+
 elif ENVIRONMENT == 'production':
-    # MySQL connection required
     DEV_DB_URI = os.environ['todo_api_db_uri']
+
 else:
     raise ValueError('Environment is not set properly, see settings file.')

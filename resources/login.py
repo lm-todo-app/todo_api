@@ -77,9 +77,15 @@ def _login_success_response(user):
     Generate tokens for the user and return the user info with cookies for
     auth, refresh and csrf.
     """
-    email = user.email
-    access_token = create_access_token(identity=email)
-    refresh_token = create_refresh_token(identity=email)
+    additional_claims = {"email": user.email}
+    access_token = create_access_token(
+        identity=user.id,
+        additional_claims=additional_claims
+    )
+    refresh_token = create_refresh_token(
+        identity=user.id,
+        additional_claims=additional_claims
+    )
     user_schema = UserSchema()
     resp = jsonify({'user': user_schema.dump(user)})
     set_access_cookies(resp, access_token)

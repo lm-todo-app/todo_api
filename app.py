@@ -12,6 +12,8 @@ from resources import users
 from resources import token
 from resources import login
 from scripts.users import users_cli
+from database import create_db
+
 
 # TODO: Add password_reset resource.
 
@@ -38,6 +40,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 with app.app_context():
     db.init_app(app)
+    create_db(db.engine)
     ma.init_app(app)
     db.create_all()
 
@@ -50,5 +53,4 @@ api.add_resource(token.Remove, f'{v1}/token/remove')
 api.add_resource(login.ConfirmEmail, f'{v1}/confirm/<conf_token>')
 
 if __name__ == '__main__':
-    print(app.url_map)
     app.run(debug=True)

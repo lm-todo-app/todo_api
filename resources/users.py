@@ -16,6 +16,7 @@ from common.confirm_email import send_confirmation_email
 from common.response import success
 from common.response import error
 from common.confirm_email import generate_confirmation_token
+from common.auth import validate_caller
 from apidocs import users as spec
 
 
@@ -59,6 +60,7 @@ class UserResource(Resource):
     """
     @jwt_required()
     @swag_from(spec.user_get)
+    @validate_caller
     def get(self, user_id):
         """
         If ID exists get a single user.
@@ -70,6 +72,7 @@ class UserResource(Resource):
 
     @jwt_required()
     @swag_from(spec.user_put)
+    @validate_caller
     def put(self, user_id):
         """
         Update user.
@@ -86,18 +89,19 @@ class UserResource(Resource):
 
     @jwt_required()
     @swag_from(spec.user_delete)
+    @validate_caller
     def delete(self, user_id):
         """
         Delete user.
         """
         user = User.query.get_or_404(user_id)
-        caller_email = get_jwt_identity()
+        caller_id = get_jwt_identity()
         delete_user(user)
         if try_commit():
             resp = jsonify(success())
             # If the user deletes their account then this removes the users
             # access tokens logging them out.
-            if user.email == caller_email:
+            if user.id == caller_id:
                 unset_jwt_cookies(resp)
             return resp
         message = {'user': 'Error deleting user'}
