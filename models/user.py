@@ -131,6 +131,7 @@ def _unique_username_or_409(username):
         message = {'user': 'User already exists with this username'}
         fail(409, data=message)
 
+
 def _strong_password_or_400(password):
     """
     Check if the password the user supplies when signing up contains:
@@ -139,53 +140,26 @@ def _strong_password_or_400(password):
         at least 1 uppercase character
         at least 1 number
         at least 1 special character
+
+    Return the error messages found in the password in response.
     """
     message = {}
-    message['whitespace'] = _check_whitespace(password)
-    message['length'] = _check_length(password)
-    message['uppercase'] = _check_uppercase(password)
-    message['number'] = _check_number(password)
-    message['symbol'] = _check_special_char(password)
-    if any(message.values()):
-        fail(400, data={'password': message})
 
-def _check_whitespace(password):
-    """
-    Check for whitespace in password string.
-    """
     if ' ' in password:
-        return 'whitespace is not allowed'
-    return None
+        message['whitespace'] = 'whitespace is not allowed'
 
-def _check_length(password):
-    """
-    Check password string is 8 characters or greater.
-    """
     if len(password) < 8:
-        return 'must be 8 characters in length'
-    return None
+        message['length'] = 'must be 8 characters in length'
 
-def _check_uppercase(password):
-    """
-    Check password string contains at least one uppercase character.
-    """
     if not any(char.isupper() for char in password):
-        return 'must contain at least one uppercase letter'
-    return None
+        message['uppercase'] = 'must contain at least one uppercase letter'
 
-def _check_number(password):
-    """
-    Check password string contains at least one number.
-    """
     if not any(char.isdigit() for char in password):
-        return 'must contain at least one number'
-    return None
+        message['number'] = 'must contain at least one number'
 
-def _check_special_char(password):
-    """
-    Check password string contains at least one special character.
-    """
     special_characters = string.punctuation
     if not any(char in special_characters for char in password):
-        return 'must contain at least one symbol'
-    return None
+        message['symbol'] = 'must contain at least one symbol'
+
+    if any(message.values()):
+        fail(400, data={'password': message})
