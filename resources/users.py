@@ -1,20 +1,19 @@
-from flask import request
-from flask import jsonify
+from flask import request, jsonify
 from flasgger import swag_from
 from flask_restful import Resource
-from flask_jwt_extended import jwt_required
-from flask_jwt_extended import get_jwt_identity
-from flask_jwt_extended import unset_jwt_cookies
-from models.user import User
-from models.user import UserSchema
-from models.user import create_user
-from models.user import delete_user
-from models.user import set_updated_user_values
-from models.user import validate_create_user_form
-from database import try_commit
+from flask_jwt_extended import jwt_required, get_jwt_identity, unset_jwt_cookies
+from models.user import (
+    User,
+    UserSchema,
+    create_user,
+    delete_user,
+    set_updated_user_values,
+    validate_create_user_form,
+    jsonify_users
+)
+from database import commit_to_db
 from common.confirm_email import send_confirmation_email
-from common.response import success
-from common.response import error
+from common.response import success, error
 from common.confirm_email import generate_confirmation_token
 from common.auth import validate_caller
 from apidocs import users as spec
@@ -30,10 +29,8 @@ class UsersResource(Resource):
         """
         Get all users.
         """
-        user_schema = UserSchema()
         users = User.query.all()
-        json_users = user_schema.dump(users, many=True)
-        return success(json_users)
+        return success(jsonify_users(users))
 
     @swag_from(spec.users_post)
     def post(self):
@@ -42,16 +39,14 @@ class UsersResource(Resource):
         user and check the password strength is sufficient as the average user
         will need this check. If this is successful then create the user.
         """
-        user_schema = UserSchema()
-        form = user_schema.validate_or_400(request.get_json())
+        form = UserSchema().validate_or_400(request.get_json())
         validate_create_user_form(form)
         user = create_user(form)
-        if try_commit():
+        if commit_to_db():
             token = generate_confirmation_token(user.email)
             send_confirmation_email(user.email, token)
             return success({'confirm': 'Please confirm email address'})
-        message = {'user': 'Error creating user'}
-        error(500, message)
+        error(500, {'user': 'Error creating user'})
 
 
 class UserResource(Resource):
@@ -65,10 +60,8 @@ class UserResource(Resource):
         """
         If ID exists get a single user.
         """
-        user_schema = UserSchema()
         user = User.query.get_or_404(user_id)
-        json_user = user_schema.dump(user)
-        return success(json_user)
+        return success(user.json())
 
     @jwt_required()
     @swag_from(spec.user_put)
@@ -77,15 +70,12 @@ class UserResource(Resource):
         """
         Update user.
         """
-        user_schema = UserSchema()
-        form = user_schema.validate_or_400(request.get_json())
+        form = UserSchema().validate_or_400(request.get_json())
         user = User.query.get_or_404(user_id)
         user = set_updated_user_values(user, form)
-        if try_commit():
-            json_user = user_schema.dump(user)
-            return success(json_user)
-        message = {'user': 'Error updating user'}
-        error(500, message)
+        if commit_to_db():
+            return success(user.json())
+        error(500, {'user': 'Error updating user'})
 
     @jwt_required()
     @swag_from(spec.user_delete)
@@ -97,12 +87,11 @@ class UserResource(Resource):
         user = User.query.get_or_404(user_id)
         caller_id = get_jwt_identity()
         delete_user(user)
-        if try_commit():
+        if commit_to_db():
             resp = jsonify(success())
             # If the user deletes their account then this removes the users
             # access tokens logging them out.
             if user.id == caller_id:
                 unset_jwt_cookies(resp)
             return resp
-        message = {'user': 'Error deleting user'}
-        error(500, message)
+        error(500, {'user': 'Error deleting user'})

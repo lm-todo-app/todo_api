@@ -4,13 +4,12 @@ Initialise SQLAlchemy and Marshmallow here to avoid circular import issues.
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import SQLAlchemyError
 from flask_marshmallow import Marshmallow
-from sqlalchemy_utils import database_exists
-from sqlalchemy_utils import create_database
+from sqlalchemy_utils import database_exists, create_database
 
 db = SQLAlchemy()
 ma = Marshmallow()
 
-def try_commit():
+def commit_to_db():
     """
     Common commit action used after changes have been made to the database.
     """

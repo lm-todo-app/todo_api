@@ -2,9 +2,7 @@ import pytest
 from common.confirm_email import generate_confirmation_token
 from database import db
 from models.user import User
-from tests.fixtures.url import USERS_URL
-from tests.fixtures.url import CONFIRM_URL
-from tests.fixtures.url import LOGIN_URL
+from tests.fixtures.url import USERS_URL, CONFIRM_URL, LOGIN_URL
 
 
 @pytest.fixture

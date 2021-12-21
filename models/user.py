@@ -1,9 +1,6 @@
 import string
-from werkzeug.security import generate_password_hash
-from werkzeug.security import check_password_hash
-from marshmallow import fields
-from marshmallow import validate
-from marshmallow import pre_load
+from werkzeug.security import generate_password_hash, check_password_hash
+from marshmallow import fields, validate, pre_load
 from database import db
 from models.base import BaseSchema
 from common.response import fail
@@ -37,6 +34,9 @@ class User(db.Model):
         """
         return check_password_hash(self.password, password)
 
+    def json(self):
+        return UserSchema().dump(self)
+
 
 class UserSchema(BaseSchema):
     """
@@ -65,6 +65,9 @@ class UserSchema(BaseSchema):
         if data.get('username'):
             data['username'] = data['username'].strip()
         return data
+
+def jsonify_users(users):
+    return [user.json() for user in users]
 
 
 def delete_user(user):

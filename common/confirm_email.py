@@ -3,13 +3,8 @@ Generates and checks a hashed string to determine if the user has confirmed
 their email.
 """
 from itsdangerous import URLSafeTimedSerializer
-from services.sendgrid import SendgridService
-from services.sendgrid import Message
-from settings import ENVIRONMENT
-from settings import APP_URL
-from settings import API_URL
-from settings import SALT
-from settings import SECRET
+from services.sendgrid import SendgridService, Message
+from settings import ENVIRONMENT, APP_URL, API_URL, SALT, SECRET
 
 
 def generate_confirmation_token(email):
