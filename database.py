@@ -9,6 +9,7 @@ from sqlalchemy_utils import database_exists, create_database
 db = SQLAlchemy()
 ma = Marshmallow()
 
+
 def commit_to_db():
     """
     Common commit action used after changes have been made to the database.
@@ -18,6 +19,7 @@ def commit_to_db():
     except SQLAlchemyError:
         return False
     return True
+
 
 def create_db(engine):
     """

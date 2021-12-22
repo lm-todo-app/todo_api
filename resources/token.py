@@ -5,7 +5,7 @@ from flask_jwt_extended import (
     get_jwt_identity,
     create_access_token,
     set_access_cookies,
-    unset_jwt_cookies
+    unset_jwt_cookies,
 )
 
 
@@ -13,6 +13,7 @@ class Auth(Resource):
     """
     Handle authentication for user.
     """
+
     @jwt_required()
     def post(self):
         """
@@ -26,6 +27,7 @@ class Refresh(Resource):
     """
     Refresh an access token.
     """
+
     @jwt_required(refresh=True)
     def post(self):
         """
@@ -33,7 +35,7 @@ class Refresh(Resource):
         """
         user = get_jwt_identity()
         access_token = create_access_token(identity=user)
-        resp = jsonify({'refresh': True})
+        resp = jsonify({"refresh": True})
         set_access_cookies(resp, access_token)
         return resp
 
@@ -42,10 +44,11 @@ class Remove(Resource):
     """
     Handle logging out user.
     """
+
     def post(self):
         """
         Remove cookies.
         """
-        resp = jsonify({'logout': True})
+        resp = jsonify({"logout": True})
         unset_jwt_cookies(resp)
         return resp

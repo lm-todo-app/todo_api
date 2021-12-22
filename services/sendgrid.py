@@ -3,7 +3,7 @@ from sendgrid.helpers.mail import Mail
 from settings import SENDGRID_API_KEY, SENDGRID_SENDER
 
 
-class Message():
+class Message:
     sender = SENDGRID_SENDER
 
     def __init__(self, contact, template_id, template_data=None):
@@ -21,8 +21,9 @@ class Message():
         return message
 
 
-class SendgridService():
+class SendgridService:
     key = SENDGRID_API_KEY
+
     def __init__(self):
         self.client = SendGridAPIClient(SendgridService.key)
 

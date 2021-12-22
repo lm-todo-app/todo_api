@@ -9,7 +9,7 @@ from models.user import (
     delete_user,
     set_updated_user_values,
     validate_create_user_form,
-    jsonify_users
+    jsonify_users,
 )
 from database import commit_to_db
 from common.confirm_email import send_confirmation_email
@@ -23,6 +23,7 @@ class UsersResource(Resource):
     """
     API methods that handle the users resource.
     """
+
     @jwt_required()
     @swag_from(spec.users_get)
     def get(self):
@@ -45,14 +46,15 @@ class UsersResource(Resource):
         if commit_to_db():
             token = generate_confirmation_token(user.email)
             send_confirmation_email(user.email, token)
-            return success({'confirm': 'Please confirm email address'})
-        error(500, {'user': 'Error creating user'})
+            return success({"confirm": "Please confirm email address"})
+        error(500, {"user": "Error creating user"})
 
 
 class UserResource(Resource):
     """
     API methods that handle the user resource.
     """
+
     @jwt_required()
     @swag_from(spec.user_get)
     @validate_caller
@@ -75,7 +77,7 @@ class UserResource(Resource):
         user = set_updated_user_values(user, form)
         if commit_to_db():
             return success(user.json())
-        error(500, {'user': 'Error updating user'})
+        error(500, {"user": "Error updating user"})
 
     @jwt_required()
     @swag_from(spec.user_delete)
@@ -94,4 +96,4 @@ class UserResource(Resource):
             if user.id == caller_id:
                 unset_jwt_cookies(resp)
             return resp
-        error(500, {'user': 'Error deleting user'})
+        error(500, {"user": "Error deleting user"})

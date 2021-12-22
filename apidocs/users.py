@@ -1,5 +1,5 @@
 from models.user import UserSchema
-import apispec # pylint: disable=unused-import
+import apispec  # pylint: disable=unused-import
 
 """
 apispec is needed to use marshmallow schemas but it is not necessary to import
@@ -10,60 +10,60 @@ message is difficult to understand when it is removed.
 """
 
 users_get = {
-    'responses': {
-        200: {'schema': UserSchema},
-        401: {'description': 'Authorization cookies is missing or invalid'}
+    "responses": {
+        200: {"schema": UserSchema},
+        401: {"description": "Authorization cookies is missing or invalid"},
     }
 }
 
 users_post = {
-    'responses': {
-        200: {'schema': UserSchema},
-        401: {'description': 'Authorization cookies is missing or invalid'}
+    "responses": {
+        200: {"schema": UserSchema},
+        401: {"description": "Authorization cookies is missing or invalid"},
     }
 }
 
 user_get = {
     "parameters": [
         {
-          "name": "user_id",
-          "in": "path",
-          "type": "int",
+            "name": "user_id",
+            "in": "path",
+            "type": "int",
         }
-      ],
-    'responses': {
-        200: {'schema': UserSchema},
-        404: {'description': 'User not found'},
-        401: {'description': 'Authorization cookies is missing or invalid'}
-    }
+    ],
+    "responses": {
+        200: {"schema": UserSchema},
+        404: {"description": "User not found"},
+        401: {"description": "Authorization cookies is missing or invalid"},
+    },
 }
 
 user_put = {
     "parameters": [
         {
-          "name": "user_id",
-          "in": "path",
-          "type": "int",
+            "name": "user_id",
+            "in": "path",
+            "type": "int",
         }
-      ],
-    'responses': {
-        200: {'schema': UserSchema},
-        404: {'description': 'User not found'},
-        401: {'description': 'Authorization cookies is missing or invalid'}
-    }
+    ],
+    "responses": {
+        200: {"schema": UserSchema},
+        404: {"description": "User not found"},
+        401: {"description": "Authorization cookies is missing or invalid"},
+    },
 }
 
 user_delete = {
     "parameters": [
         {
-          "name": "user_id",
-          "in": "path",
-          "type": "int",
+            "name": "user_id",
+            "in": "path",
+            "type": "int",
         }
-      ],
-    'responses': {
-        200: {'schema': UserSchema},
-        404: {'description': 'User not found'},
-        401: {'description': 'Authorization cookies is missing or invalid'}
-    }
+    ],
+    "responses": {
+        200: {"schema": UserSchema},
+        404: {"description": "User not found"},
+        401: {"description": "Authorization cookies is missing or invalid"},
+    },
 }

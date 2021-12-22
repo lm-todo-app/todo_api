@@ -19,8 +19,9 @@ def success(data=None):
         null.
     """
     if not isinstance(data, (dict, list)) and data is not None:
-        data = {'data': data}
-    return {'status': 'success', 'data': data}
+        data = {"data": data}
+    return {"status": "success", "data": data}
+
 
 def fail(status_code, data=None):
     """
@@ -36,8 +37,9 @@ def fail(status_code, data=None):
         response object's keys SHOULD correspond to those POST values.
     """
     if not isinstance(data, (dict, list)) and data is not None:
-        data = {'data': data}
-    abort(status_code, status='fail', data=data)
+        data = {"data": data}
+    abort(status_code, status="fail", data=data)
+
 
 def error(status_code, message, data=None):
     """
@@ -58,7 +60,7 @@ def error(status_code, message, data=None):
     code is currently not used for any errors.
     """
     if not isinstance(data, (dict, list)) and data is not None:
-        data = {'data': data}
+        data = {"data": data}
     if isinstance(message, dict) and message is not None:
-        abort(status_code, status='error', message=message, data=data)
-    raise ValueError('message must be a dict and cannot be empty')
+        abort(status_code, status="error", message=message, data=data)
+    raise ValueError("message must be a dict and cannot be empty")

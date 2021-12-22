@@ -10,6 +10,7 @@ class User(db.Model):
     """
     User model, currently has username and email as unique fields.
     """
+
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
@@ -42,29 +43,28 @@ class UserSchema(BaseSchema):
     """
     Schema for user validation with API.
     """
+
     class Meta:
         model = User
         load_instance = True
 
     email = fields.Email(required=True)
     password = fields.Str(load_only=True)
-    username = fields.Str(
-        validate=validate.Length(min=5, max=100),
-        required=True
-    )
+    username = fields.Str(validate=validate.Length(min=5, max=100), required=True)
 
     @pre_load
-    def process_input(self, data, **kwargs): # pylint: disable=unused-argument
+    def process_input(self, data, **kwargs):  # pylint: disable=unused-argument
         """
         Before checking for validation strip whitespace from email and username.
         """
         if not data:
             return data
-        if data.get('email'):
-            data['email'] = data['email'].lower().strip()
-        if data.get('username'):
-            data['username'] = data['username'].strip()
+        if data.get("email"):
+            data["email"] = data["email"].lower().strip()
+        if data.get("username"):
+            data["username"] = data["username"].strip()
         return data
+
 
 def jsonify_users(users):
     return [user.json() for user in users]
@@ -72,6 +72,7 @@ def jsonify_users(users):
 
 def delete_user(user):
     db.session.delete(user)
+
 
 def create_user(form):
     """
@@ -81,11 +82,12 @@ def create_user(form):
     hashed password to the user object.
     """
     schema = UserSchema()
-    password = form.pop('password')
+    password = form.pop("password")
     user = schema.load(form, session=db.session)
     user.set_password(password)
     db.session.add(user)
     return user
+
 
 def validate_create_user_form(form):
     """
@@ -95,11 +97,12 @@ def validate_create_user_form(form):
     Also check unique username, email and that the user has used a strong
     password.
     """
-    if not form.get('password'):
-        fail(400, {'form':{'password': 'Missing data for required field.'}})
-    _unique_email_or_409(form['email'])
-    _unique_username_or_409(form['username'])
-    _strong_password_or_400(form['password'])
+    if not form.get("password"):
+        fail(400, {"form": {"password": "Missing data for required field."}})
+    _unique_email_or_409(form["email"])
+    _unique_username_or_409(form["username"])
+    _strong_password_or_400(form["password"])
+
 
 def set_updated_user_values(user, form):
     """
@@ -110,28 +113,30 @@ def set_updated_user_values(user, form):
     to are not already in use by another user and will throw an error if
     they are.
     """
-    username = form.get('username')
+    username = form.get("username")
     if username and user.username != username:
         _unique_username_or_409(username)
         user.username = username
-    email = form.get('email')
+    email = form.get("email")
     if email and user.email != email:
         _unique_email_or_409(email)
         user.email = email
-    password = form.get('password')
+    password = form.get("password")
     if password:
         _strong_password_or_400(password)
         user.set_password(password)
     return user
 
+
 def _unique_email_or_409(email):
     if User.query.filter_by(email=email).first():
-        message = {'user': 'User already exists with this email'}
+        message = {"user": "User already exists with this email"}
         fail(409, data=message)
+
 
 def _unique_username_or_409(username):
     if User.query.filter_by(username=username).first():
-        message = {'user': 'User already exists with this username'}
+        message = {"user": "User already exists with this username"}
         fail(409, data=message)
 
 
@@ -148,21 +153,21 @@ def _strong_password_or_400(password):
     """
     message = {}
 
-    if ' ' in password:
-        message['whitespace'] = 'whitespace is not allowed'
+    if " " in password:
+        message["whitespace"] = "whitespace is not allowed"
 
     if len(password) < 8:
-        message['length'] = 'must be 8 characters in length'
+        message["length"] = "must be 8 characters in length"
 
     if not any(char.isupper() for char in password):
-        message['uppercase'] = 'must contain at least one uppercase letter'
+        message["uppercase"] = "must contain at least one uppercase letter"
 
     if not any(char.isdigit() for char in password):
-        message['number'] = 'must contain at least one number'
+        message["number"] = "must contain at least one number"
 
     special_characters = string.punctuation
     if not any(char in special_characters for char in password):
-        message['symbol'] = 'must contain at least one symbol'
+        message["symbol"] = "must contain at least one symbol"
 
     if any(message.values()):
-        fail(400, data={'password': message})
+        fail(400, data={"password": message})
