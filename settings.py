@@ -16,6 +16,8 @@ SENDGRID_API_KEY = os.environ["SENDGRID_API_KEY"]
 
 TEST_DB_URI = "sqlite:////tmp/todo_test.db"
 
+USE_CACHE = True
+
 APP_URL = os.environ["TODO_APP_URL"]
 
 API_URL = "http://localhost:5000/api"  # TODO Find a better way to do this
@@ -24,10 +26,11 @@ SALT = "salt"
 #  SALT = app.config['SECURITY_PASSWORD_SALT']
 
 if ENVIRONMENT == "development":
-    DEV_DB_URI = "sqlite:////tmp/todo_dev.db"
+    # DB_URI = "sqlite:////tmp/todo_dev.db"
+    DB_URI = "postgresql://docker:docker@localhost:5432/todo"
 
 elif ENVIRONMENT == "production":
-    DEV_DB_URI = os.environ["todo_api_db_uri"]
+    DB_URI = os.environ["todo_api_db_uri"]
 
 else:
     raise ValueError("Environment is not set properly, see settings file.")

@@ -6,7 +6,8 @@ Test settings and configuration.
 # and create a dev or prod db.
 import settings
 
-settings.DEV_DB_URI = settings.TEST_DB_URI
+settings.DB_URI = settings.TEST_DB_URI
+settings.USE_CACHE = False
 
 import pytest
 from app import app

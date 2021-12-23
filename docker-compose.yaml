@@ -1,0 +1,19 @@
+version: "3.9"
+services:
+  redis:
+    image: "redis:alpine"
+    ports:
+      - "6379:6379"
+  postgresql:
+    image: "postgres"
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=docker
+      - POSTGRES_PASSWORD=docker
+      - POSTGRES_DB=todo
+    volumes:
+      - database-data:/var/lib/postgresql/data/
+
+volumes:
+  database-data:

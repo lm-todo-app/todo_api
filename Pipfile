@@ -26,6 +26,7 @@ flasgger = "*"
 apispec = "*"
 mysqlclient = "*"
 sqlalchemy-utils = "*"
+psycopg2 = "*"
 
 [requires]
 python_version = "3.8"

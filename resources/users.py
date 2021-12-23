@@ -17,6 +17,7 @@ from common.response import success, error
 from common.confirm_email import generate_confirmation_token
 from common.auth import validate_caller
 from apidocs import users as spec
+from cache import cache, resource_cache
 
 
 class UsersResource(Resource):
@@ -26,6 +27,7 @@ class UsersResource(Resource):
 
     @jwt_required()
     @swag_from(spec.users_get)
+    @cache.cached(timeout=50)
     def get(self):
         """
         Get all users.
@@ -58,6 +60,7 @@ class UserResource(Resource):
     @jwt_required()
     @swag_from(spec.user_get)
     @validate_caller
+    @resource_cache.memoize(timeout=50)
     def get(self, user_id):
         """
         If ID exists get a single user.
