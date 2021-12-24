@@ -27,6 +27,11 @@ apispec = "*"
 mysqlclient = "*"
 sqlalchemy-utils = "*"
 psycopg2 = "*"
+flask-caching = "*"
+redis = "*"
 
 [requires]
 python_version = "3.8"
+
+[pipenv]
+allow_prereleases = true
