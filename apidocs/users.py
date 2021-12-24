@@ -1,6 +1,3 @@
-from models.user import UserSchema
-import apispec  # pylint: disable=unused-import
-
 """
 apispec is needed to use marshmallow schemas but it is not necessary to import
 it.
@@ -8,6 +5,9 @@ it.
 Importing anyway to prevent removing the unused package by accident as the error
 message is difficult to understand when it is removed.
 """
+import apispec  # pylint: disable=unused-import
+from models.user import UserSchema
+
 
 users_get = {
     "responses": {
