@@ -1,3 +1,4 @@
+import json
 from flask import Flask
 from flask_restful import Api
 from flask_jwt_extended import JWTManager
@@ -8,6 +9,7 @@ from database import db, ma, create_db
 from resources import users, token, login
 from scripts.users import users_cli
 from cache import cache, resource_cache
+from werkzeug.exceptions import HTTPException
 
 
 # TODO: Add password_reset resource.
@@ -48,6 +50,23 @@ api.add_resource(token.Auth, f"{v1}/token/auth")
 api.add_resource(token.Refresh, f"{v1}/token/refresh")
 api.add_resource(token.Remove, f"{v1}/token/remove")
 api.add_resource(login.ConfirmEmail, f"{v1}/confirm/<conf_token>")
+
+
+@app.errorhandler(HTTPException)
+def handle_exception(e):
+    """Return JSON instead of HTML for HTTP errors."""
+    # start with the correct headers and status code from the error
+    response = e.get_response()
+    # replace the body with JSON
+    response.data = json.dumps(
+        {
+            "status": "fail",
+            "data": {e.name: e.description},
+        }
+    )
+    response.content_type = "application/json"
+    return response
+
 
 if __name__ == "__main__":
     app.run(debug=True)

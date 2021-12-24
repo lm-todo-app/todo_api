@@ -106,6 +106,10 @@ class TestUserGet:
         response = client.get(f"{USERS_URL}/1")
         assert response.status_code == 200
 
+    def test_get_user_id_not_int(self, client, login):
+        response = client.get(f"{USERS_URL}/text")
+        assert response.status_code == 400
+
     def test_get_user_does_not_exist(self, client, login):
         response = client.get(f"{USERS_URL}/100")
         assert response.status_code == 404
@@ -122,6 +126,10 @@ class TestUserGet:
         response = client.delete(f"{USERS_URL}/1")
         assert response.status_code == 200
 
+    def test_delete_user_id_not_int(self, client, login):
+        response = client.delete(f"{USERS_URL}/text")
+        assert response.status_code == 400
+
     def test_delete_self_logout(self, client, login):
         response = client.delete(f"{USERS_URL}/1")
         assert response.status_code == 200
@@ -136,6 +144,14 @@ class TestUserGet:
         response = client.put(f"{USERS_URL}/1", json=data)
         assert response.status_code == 200
         assert response.json["data"]["username"] == "updated user"
+
+    def test_update_username_id_not_int(self, client, login):
+        data = {
+            "username": "updated user",
+            "email": "mail@test.com",
+        }
+        response = client.put(f"{USERS_URL}/text", json=data)
+        assert response.status_code == 400
 
     def test_update_email(self, client, login):
         data = {

@@ -2,6 +2,7 @@
 
 from functools import wraps
 from flask_jwt_extended import get_jwt_identity
+from common.response import fail
 
 
 def validate_caller(f):
@@ -15,6 +16,24 @@ def validate_caller(f):
     def wrapper(*args, **kwargs):
         if kwargs.get("user_id") == "me":
             kwargs["user_id"] = get_jwt_identity()
+        return f(*args, **kwargs)
+
+    return wrapper
+
+
+def id_or_400(f):
+    """
+    Check the id passed in the url is an int.
+    """
+
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        id = kwargs.get("user_id")
+        if id != "me":
+            try:
+                id = int(id)
+            except ValueError:
+                fail(400, {"url": {"user_id": "User ID is not valid"}})
         return f(*args, **kwargs)
 
     return wrapper
