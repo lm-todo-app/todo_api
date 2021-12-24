@@ -1,6 +1,7 @@
 """
 Test settings and configuration.
 """
+import pytest
 
 # Change the dev db to the test db so that when app is imported it doesn't try
 # and create a dev or prod db.
@@ -9,9 +10,8 @@ import settings
 settings.DB_URI = settings.TEST_DB_URI
 settings.USE_CACHE = False
 
-import pytest
-from app import app
-from database import db
+from app import app # pylint: disable=wrong-import-position
+from database import db # pylint: disable=wrong-import-position
 
 
 @pytest.fixture

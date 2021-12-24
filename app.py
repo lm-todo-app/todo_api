@@ -4,12 +4,12 @@ from flask_restful import Api
 from flask_jwt_extended import JWTManager
 from flask_migrate import Migrate
 from flasgger import Swagger
+from werkzeug.exceptions import HTTPException
 from settings import SECRET, JWT_SECRET, DB_URI
 from database import db, ma, create_db
 from resources import users, token, login
 from scripts.users import users_cli
 from cache import cache, resource_cache
-from werkzeug.exceptions import HTTPException
 
 
 # TODO: Add password_reset resource.

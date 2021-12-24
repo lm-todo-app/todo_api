@@ -15,11 +15,11 @@ class ResourceCache(Cache):
     def _memoize_make_cache_key(
         self,
         make_name=None,
-        timeout=None,
-        forced_update=False,
-        hash_method=md5,
-        source_check=False,
-        args_to_ignore=None,
+        timeout=None, # pylint: disable=unused-import
+        forced_update=False, # pylint: disable=unused-import
+        hash_method=md5, # pylint: disable=unused-import
+        source_check=False, # pylint: disable=unused-import
+        args_to_ignore=None, # pylint: disable=unused-import
     ):
         def make_cache_key(f, *args, **kwargs):
             fname, _ = function_namespace(f)
