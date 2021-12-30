@@ -44,7 +44,8 @@ with app.app_context():
     db.create_all()
 
 api.add_resource(users.UsersResource, f"{v1}/users")
-api.add_resource(users.UserResource, f"{v1}/users/<user_id>")
+api.add_resource(users.UserResource, f"{v1}/users/<int:user_id>")
+api.add_resource(users.CurrentUserResource, f"{v1}/users/current")
 api.add_resource(login.Login, f"{v1}/login")
 api.add_resource(token.Auth, f"{v1}/token/auth")
 api.add_resource(token.Refresh, f"{v1}/token/refresh")

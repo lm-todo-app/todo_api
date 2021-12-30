@@ -108,7 +108,7 @@ class TestUserGet:
 
     def test_get_user_id_not_int(self, client, login):
         response = client.get(f"{USERS_URL}/text")
-        assert response.status_code == 400
+        assert response.status_code == 404
 
     def test_get_user_does_not_exist(self, client, login):
         response = client.get(f"{USERS_URL}/100")
@@ -128,7 +128,7 @@ class TestUserGet:
 
     def test_delete_user_id_not_int(self, client, login):
         response = client.delete(f"{USERS_URL}/text")
-        assert response.status_code == 400
+        assert response.status_code == 404
 
     def test_delete_self_logout(self, client, login):
         response = client.delete(f"{USERS_URL}/1")
@@ -151,7 +151,7 @@ class TestUserGet:
             "email": "mail@test.com",
         }
         response = client.put(f"{USERS_URL}/text", json=data)
-        assert response.status_code == 400
+        assert response.status_code == 404
 
     def test_update_email(self, client, login):
         data = {
@@ -178,23 +178,23 @@ class TestUserGet:
         response = client.post(LOGIN_URL, json=data)
         assert response.status_code == 200
 
-    def test_get_user_me(self, client, login):
-        response = client.get(f"{USERS_URL}/me")
+    def test_get_current_user(self, client, login):
+        response = client.get(f"{USERS_URL}/current")
         assert response.status_code == 200
         assert response.json["data"]["id"] == 1
 
-    def test_update_user_me(self, client, login):
+    def test_update_current_user(self, client, login):
         data = {
             "username": "updated user",
             "email": "mail@test.com",
         }
-        response = client.put(f"{USERS_URL}/me", json=data)
+        response = client.put(f"{USERS_URL}/current", json=data)
         assert response.status_code == 200
         assert response.json["data"]["id"] == 1
         assert response.json["data"]["username"] == "updated user"
 
-    def test_delete_user_me(self, client, login):
-        response = client.delete(f"{USERS_URL}/me")
+    def test_delete_current_user(self, client, login):
+        response = client.delete(f"{USERS_URL}/current")
         assert response.status_code == 200
         response = client.get(f"{USERS_URL}")
         assert response.status_code == 401

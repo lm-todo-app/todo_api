@@ -4,6 +4,13 @@ from marshmallow import fields, validate, pre_load
 from database import db
 from models.base import BaseSchema
 from common.response import fail
+from common.confirm_email import (
+    generate_confirmation_token,
+    print_confirmation_url,
+    create_email_confirmation_message,
+)
+from services.sendgrid import SendgridService
+from settings import ENVIRONMENT
 
 
 class User(db.Model):
@@ -34,6 +41,18 @@ class User(db.Model):
         Checks the password in the database matches the supplied password.
         """
         return check_password_hash(self.password, password)
+
+    def send_confirmation_email(self):
+        """
+        Sends the confirmation email if in production and prints the confirmation
+        URL to the terminal in dev.
+        """
+        token = generate_confirmation_token(self.email)
+        print_confirmation_url(token)
+        if ENVIRONMENT != "production":
+            return
+        message = create_email_confirmation_message(self.email, token)
+        SendgridService().send(message)
 
     def json(self):
         return UserSchema().dump(self)
@@ -81,15 +100,15 @@ def create_user(form):
     marshmallow loads which creates the user model object and then add the
     hashed password to the user object.
     """
-    schema = UserSchema()
+    _validate_create_user_form(form)
     password = form.pop("password")
-    user = schema.load(form, session=db.session)
+    user = UserSchema().load(form, session=db.session)
     user.set_password(password)
     db.session.add(user)
     return user
 
 
-def validate_create_user_form(form):
+def _validate_create_user_form(form):
     """
     Password is required here but is not required by marshmallow because
     it is load only so we need to check the field exists here instead.
@@ -104,7 +123,7 @@ def validate_create_user_form(form):
     _strong_password_or_400(form["password"])
 
 
-def set_updated_user_values(user, form):
+def update_user(user, form):
     """
     check that each field is in the response, if they aren't then they don't
     need to be updated.

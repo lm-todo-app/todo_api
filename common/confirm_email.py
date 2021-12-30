@@ -3,8 +3,8 @@ Generates and checks a hashed string to determine if the user has confirmed
 their email.
 """
 from itsdangerous import URLSafeTimedSerializer
-from services.sendgrid import SendgridService, Message
-from settings import ENVIRONMENT, APP_URL, API_URL, SALT, SECRET
+from services.sendgrid import Message
+from settings import APP_URL, API_URL, SALT, SECRET
 
 
 def generate_confirmation_token(email):
@@ -28,20 +28,7 @@ def confirm_token(token, expiration=3600):
     return email
 
 
-def send_confirmation_email(contact, confirmation_token):
-    """
-    Sends the confirmation email if in production and prints the confirmation
-    URL to the terminal in dev.
-    """
-    _print_confirmation_url(confirmation_token)
-    if ENVIRONMENT != "production":
-        return
-    service = SendgridService()
-    message = _create_email_confirmation_message(contact, confirmation_token)
-    service.send(message)
-
-
-def _print_confirmation_url(confirmation_token):
+def print_confirmation_url(confirmation_token):
     """
     Print the confirmation URL in dev.
     """
@@ -50,7 +37,7 @@ def _print_confirmation_url(confirmation_token):
     print(confirm_url + "\n")
 
 
-def _create_email_confirmation_message(contact, confirmation_token):
+def create_email_confirmation_message(contact, confirmation_token):
     """
     Confirmation template and data for the dynamic template stored in sendgrid.
     """

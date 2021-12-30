@@ -7,19 +7,15 @@ from models.user import (
     UserSchema,
     create_user,
     delete_user,
-    set_updated_user_values,
-    validate_create_user_form,
+    update_user,
     jsonify_users,
 )
 from database import commit_to_db
-from common.confirm_email import send_confirmation_email
 from common.response import success, error
-from common.confirm_email import generate_confirmation_token
-from common.auth import validate_caller, id_or_400
 from apidocs import users as spec
 from cache import cache, resource_cache
 
-not_found = {"status": "fail", "data": {"Not Found": "User does not exist"}}
+USER_NOT_FOUND = {"status": "fail", "data": {"Not Found": "User does not exist"}}
 
 
 class UsersResource(Resource):
@@ -45,11 +41,9 @@ class UsersResource(Resource):
         will need this check. If this is successful then create the user.
         """
         form = UserSchema().validate_or_400(request.get_json())
-        validate_create_user_form(form)
         user = create_user(form)
         if commit_to_db():
-            token = generate_confirmation_token(user.email)
-            send_confirmation_email(user.email, token)
+            user.send_confirmation_email()
             return success({"confirm": "Please confirm email address"})
         error(500, {"user": "Error creating user"})
 
@@ -61,47 +55,90 @@ class UserResource(Resource):
 
     @jwt_required()
     @swag_from(spec.user_get)
-    @id_or_400
-    @validate_caller
     @resource_cache.memoize(timeout=50)
     def get(self, user_id):
         """
-        If ID exists get a single user.
+        Get user.
         """
-        user = User.query.get_or_404(user_id, not_found)
-        return success(user.json())
+        return _get_user(user_id)
 
     @jwt_required()
     @swag_from(spec.user_put)
-    @id_or_400
-    @validate_caller
     def put(self, user_id):
         """
         Update user.
         """
-        form = UserSchema().validate_or_400(request.get_json())
-        user = User.query.get_or_404(user_id, not_found)
-        user = set_updated_user_values(user, form)
-        if commit_to_db():
-            return success(user.json())
-        error(500, {"user": "Error updating user"})
+        return _update_user(user_id)
 
     @jwt_required()
     @swag_from(spec.user_delete)
-    @id_or_400
-    @validate_caller
     def delete(self, user_id):
         """
         Delete user.
         """
-        user = User.query.get_or_404(user_id, not_found)
-        caller_id = get_jwt_identity()
-        delete_user(user)
-        if commit_to_db():
-            resp = jsonify(success())
-            # If the user deletes their account then this removes the users
-            # access tokens logging them out.
-            if user.id == caller_id:
-                unset_jwt_cookies(resp)
-            return resp
-        error(500, {"user": "Error deleting user"})
+        return _delete_user(user_id)
+
+
+class CurrentUserResource(Resource):
+    """
+    API methods that handle the user resource for the currently logged in user.
+    """
+
+    @jwt_required()
+    @swag_from(spec.user_get)
+    @resource_cache.memoize(timeout=50)
+    def get(self):
+        """
+        Get current user.
+        """
+        return _get_user()
+
+    @jwt_required()
+    @swag_from(spec.user_put)
+    def put(self):
+        """
+        Update current user.
+        """
+        return _update_user()
+
+    @jwt_required()
+    @swag_from(spec.user_delete)
+    def delete(self):
+        """
+        Delete current user.
+        """
+        return _delete_user()
+
+
+def _get_user(user_id=None):
+    if not user_id:
+        user_id = get_jwt_identity()
+    user = User.query.get_or_404(user_id, USER_NOT_FOUND)
+    return success(user.json())
+
+
+def _update_user(user_id=None):
+    if not user_id:
+        user_id = get_jwt_identity()
+    form = UserSchema().validate_or_400(request.get_json())
+    user = User.query.get_or_404(user_id, USER_NOT_FOUND)
+    user = update_user(user, form)
+    if commit_to_db():
+        return success(user.json())
+    error(500, {"user": "Error updating user"})
+
+
+def _delete_user(user_id=None):
+    if not user_id:
+        user_id = get_jwt_identity()
+    user = User.query.get_or_404(user_id, USER_NOT_FOUND)
+    caller_id = get_jwt_identity()
+    delete_user(user)
+    if commit_to_db():
+        resp = jsonify(success())
+        # If the user deletes their account then this removes the users
+        # access tokens logging them out.
+        if user.id == caller_id:
+            unset_jwt_cookies(resp)
+        return resp
+    error(500, {"user": "Error deleting user"})
