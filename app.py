@@ -5,7 +5,7 @@ from flask_jwt_extended import JWTManager
 from flask_migrate import Migrate
 from flasgger import Swagger
 from werkzeug.exceptions import HTTPException
-from settings import SECRET, JWT_SECRET, DB_URI
+from settings import SECRET, JWT_SECRET, DB_URI, SALT
 from database import db, ma, create_db
 from resources import users, token, login
 from scripts.users import users_cli
@@ -34,6 +34,7 @@ app.config["JWT_COOKIE_CSRF_PROTECT"] = True
 app.config["JWT_REFRESH_COOKIE_PATH"] = f"{v1}/token/refresh"
 app.config["SQLALCHEMY_DATABASE_URI"] = DB_URI
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+app.config['SECURITY_PASSWORD_SALT'] = SALT
 
 with app.app_context():
     db.init_app(app)

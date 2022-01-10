@@ -16,14 +16,20 @@ SENDGRID_API_KEY = os.environ["SENDGRID_API_KEY"]
 
 TEST_DB_URI = "sqlite:////tmp/todo_test.db"
 
-USE_CACHE = True
-
 APP_URL = os.environ["TODO_APP_URL"]
 
 API_URL = "http://localhost:5000/api"  # TODO Find a better way to do this
 
+
+USE_CACHE = False
+if ENVIRONMENT == "production":
+    USE_CACHE = True
+
+
 SALT = "salt"
-#  SALT = app.config['SECURITY_PASSWORD_SALT']
+if ENVIRONMENT == "production":
+    SALT = os.environ["SECURITY_PASSWORD_SALT"]
+
 
 if ENVIRONMENT == "development":
     # DB_URI = "sqlite:////tmp/todo_dev.db"
