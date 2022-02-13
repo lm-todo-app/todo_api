@@ -1,8 +1,13 @@
 import pytest
 from common.confirm_email import generate_confirmation_token
-from tests.fixtures.user import login, teardown_user, setup_user
+from tests.fixtures.user import (
+    login,
+    login_admin,
+    teardown_user,
+    setup_user,
+    setup_admin_user,
+)
 from tests.fixtures.url import USERS_URL, CONFIRM_URL, LOGIN_URL, TOKEN_URL
-
 
 @pytest.mark.usefixtures("teardown_user")
 def test_create_user(client):
@@ -100,8 +105,8 @@ class TestUser:
         assert response.status_code == 400
 
 
-@pytest.mark.usefixtures("setup_user", "login")
-class TestUserGet:
+@pytest.mark.usefixtures("setup_admin_user", "login_admin", "teardown_user")
+class TestAdminUserGet:
     def test_get_user(self, client, login):
         response = client.get(f"{USERS_URL}/1")
         assert response.status_code == 200
@@ -201,3 +206,39 @@ class TestUserGet:
         data = {"email": "mail@test.com", "password": "Testpassword@1"}
         response = client.post(LOGIN_URL, json=data)
         assert response.status_code == 401
+
+
+@pytest.mark.usefixtures("setup_user", "login", "teardown_user")
+class TestUserPermissions:
+    def test_delete_user(self, client, login):
+        response = client.delete(f"{USERS_URL}/1")
+        assert response.status_code == 403
+
+    def test_delete_self_logout(self, client, login):
+        response = client.delete(f"{USERS_URL}/1")
+        assert response.status_code == 403
+
+    def test_update_username(self, client, login):
+        data = {
+            "username": "updated user",
+            "email": "mail@test.com",
+        }
+        response = client.put(f"{USERS_URL}/1", json=data)
+        assert response.status_code == 403
+
+    def test_update_email(self, client, login):
+        data = {
+            "username": "test user",
+            "email": "updated_mail@test.com",
+        }
+        response = client.put(f"{USERS_URL}/1", json=data)
+        assert response.status_code == 403
+
+    def test_update_password(self, client, login):
+        data = {
+            "username": "test user",
+            "email": "mail@test.com",
+            "password": "Updatedpassword@1",
+        }
+        response = client.put(f"{USERS_URL}/1", json=data)
+        assert response.status_code == 403

@@ -1,26 +1,32 @@
 from getpass import getpass
-from datetime import datetime
 import click
 from flask.cli import AppGroup
 from models.user import create_user
 from database import commit_to_db
-
+from authz import Roles
 
 users_cli = AppGroup("users")
 
 
 @users_cli.command("create")
-@click.argument("name")
-def create(name):
+def create():
     """
     Run: 'flask users create $name'
     Create a normal user, skip email confirmation.
     """
-    print("hello {}".format(name))
+    _create_user(Roles.user)
 
 
 @users_cli.command("create_superadmin")
 def create_superadmin():
+    """
+    Run: 'flask users create_superadmin'
+    Create a superadmin user, skip email confirmation.
+    """
+    _create_user(Roles.superadmin)
+
+
+def _create_user(role):
     """
     Run: 'flask users create_superadmin'
     Create a super admin user, skip email confirmation.
@@ -38,9 +44,9 @@ def create_superadmin():
         print("\nPassword does not match!\n")
         return
 
-    form["confirmed_on"] = datetime.now()
+    user = create_user(form, autoconfirm=True)
+    user.set_role(role)
 
-    user = create_user(form)
     if commit_to_db():
         print(f"\nUser {user.username} created successfully!\n")
     else:

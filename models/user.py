@@ -1,4 +1,5 @@
 import string
+from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 from marshmallow import fields, validate, pre_load
 from database import db
@@ -10,6 +11,7 @@ from common.confirm_email import (
     create_email_confirmation_message,
 )
 from services.sendgrid import SendgridService
+from authz import e
 from settings import ENVIRONMENT
 
 
@@ -57,6 +59,12 @@ class User(db.Model):
     def json(self):
         return UserSchema().dump(self)
 
+    def set_role(self, role):
+        e.add_role_for_user(self.email, role)
+
+    def has_permission(self, obj, act):
+        return e.enforce(self.email, obj, act)
+
 
 class UserSchema(BaseSchema):
     """
@@ -90,20 +98,26 @@ def jsonify_users(users):
 
 
 def delete_user(user):
+    # TODO: Remove from authz table
     db.session.delete(user)
 
 
-def create_user(form):
+def create_user(form, autoconfirm=False):
     """
     We need to exclude the password from the request as it needs to be
     hashed before being saved to the database. We exclude it from the
     marshmallow loads which creates the user model object and then add the
     hashed password to the user object.
+
+    Autoconfirm True allows users created from the cli to skip confirmation
+    email.
     """
     _validate_create_user_form(form)
     password = form.pop("password")
     user = UserSchema().load(form, session=db.session)
     user.set_password(password)
+    if autoconfirm:
+        user.confirmed_on = datetime.now()
     db.session.add(user)
     return user
 
@@ -140,6 +154,7 @@ def update_user(user, form):
     if email and user.email != email:
         _unique_email_or_409(email)
         user.email = email
+        # TODO: If email has changed update role table
     password = form.get("password")
     if password:
         _strong_password_or_400(password)

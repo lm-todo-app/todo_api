@@ -12,6 +12,7 @@ settings.USE_CACHE = False
 
 from app import app # pylint: disable=wrong-import-position
 from database import db # pylint: disable=wrong-import-position
+import authz # pylint: disable=wrong-import-position
 
 
 @pytest.fixture
@@ -25,4 +26,5 @@ def client():
     with app.test_client() as client:  # pylint: disable=redefined-outer-name
         with app.app_context():
             db.create_all()
+            authz.init()
             yield client

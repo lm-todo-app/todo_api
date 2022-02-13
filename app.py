@@ -10,7 +10,7 @@ from database import db, ma, create_db
 from resources import users, token, login
 from scripts.users import users_cli
 from cache import cache, resource_cache
-
+import authz
 
 # TODO: Add password_reset resource.
 
@@ -69,6 +69,8 @@ def handle_exception(e):
     response.content_type = "application/json"
     return response
 
+# Add authz policies to database
+authz.init()
 
 if __name__ == "__main__":
     app.run(debug=True)

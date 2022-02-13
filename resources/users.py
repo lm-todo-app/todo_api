@@ -11,6 +11,7 @@ from models.user import (
     jsonify_users,
 )
 from database import commit_to_db
+from authz import has_access, Objects, Actions, Roles
 from common.response import success, error
 from apidocs import users as spec
 from cache import cache, resource_cache
@@ -24,6 +25,7 @@ class UsersResource(Resource):
     """
 
     @jwt_required()
+    @has_access(Objects.users, Actions.read)
     @swag_from(spec.users_get)
     @cache.cached(timeout=50)
     def get(self):
@@ -42,6 +44,7 @@ class UsersResource(Resource):
         """
         form = UserSchema().validate_or_400(request.get_json())
         user = create_user(form)
+        user.set_role(Roles.user)
         if commit_to_db():
             user.send_confirmation_email()
             return success({"confirm": "Please confirm email address"})
@@ -54,6 +57,7 @@ class UserResource(Resource):
     """
 
     @jwt_required()
+    @has_access(Objects.users, Actions.read)
     @swag_from(spec.user_get)
     @resource_cache.memoize(timeout=50)
     def get(self, user_id):
@@ -63,6 +67,7 @@ class UserResource(Resource):
         return _get_user(user_id)
 
     @jwt_required()
+    @has_access(Objects.users, Actions.write)
     @swag_from(spec.user_put)
     def put(self, user_id):
         """
@@ -71,6 +76,7 @@ class UserResource(Resource):
         return _update_user(user_id)
 
     @jwt_required()
+    @has_access(Objects.users, Actions.write)
     @swag_from(spec.user_delete)
     def delete(self, user_id):
         """
@@ -91,7 +97,8 @@ class CurrentUserResource(Resource):
         """
         Get current user.
         """
-        return _get_user()
+        user_id = get_jwt_identity()
+        return _get_user(user_id)
 
     @jwt_required()
     @swag_from(spec.user_put)
@@ -99,7 +106,8 @@ class CurrentUserResource(Resource):
         """
         Update current user.
         """
-        return _update_user()
+        user_id = get_jwt_identity()
+        return _update_user(user_id)
 
     @jwt_required()
     @swag_from(spec.user_delete)
@@ -107,19 +115,16 @@ class CurrentUserResource(Resource):
         """
         Delete current user.
         """
-        return _delete_user()
-
-
-def _get_user(user_id=None):
-    if not user_id:
         user_id = get_jwt_identity()
+        return _delete_user(user_id)
+
+
+def _get_user(user_id):
     user = User.query.get_or_404(user_id, USER_NOT_FOUND)
     return success(user.json())
 
 
-def _update_user(user_id=None):
-    if not user_id:
-        user_id = get_jwt_identity()
+def _update_user(user_id):
     form = UserSchema().validate_or_400(request.get_json())
     user = User.query.get_or_404(user_id, USER_NOT_FOUND)
     user = update_user(user, form)
@@ -128,9 +133,7 @@ def _update_user(user_id=None):
     error(500, {"user": "Error updating user"})
 
 
-def _delete_user(user_id=None):
-    if not user_id:
-        user_id = get_jwt_identity()
+def _delete_user(user_id):
     user = User.query.get_or_404(user_id, USER_NOT_FOUND)
     caller_id = get_jwt_identity()
     delete_user(user)

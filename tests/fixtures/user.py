@@ -1,13 +1,20 @@
 import pytest
-from common.confirm_email import generate_confirmation_token
 from database import db
-from models.user import User
-from tests.fixtures.url import USERS_URL, CONFIRM_URL, LOGIN_URL
+from models.user import User, create_user, delete_user
+from authz import Roles
+from tests.fixtures.url import LOGIN_URL
 
 
 @pytest.fixture
 def login(client):
     data = {"email": "mail@test.com", "password": "Testpassword@1"}
+    response = client.post(LOGIN_URL, json=data)
+    yield
+
+
+@pytest.fixture
+def login_admin(client):
+    data = {"email": "admin@test.com", "password": "Testpassword@2"}
     response = client.post(LOGIN_URL, json=data)
     yield
 
@@ -19,16 +26,32 @@ def setup_user(client):
         "email": "mail@test.com",
         "password": "Testpassword@1",
     }
-    response = client.post(USERS_URL, json=data)
-    conf_token = generate_confirmation_token(data["email"])
-    response = client.get(CONFIRM_URL + conf_token)
-    yield
-    User.query.delete()
+    user = create_user(data, autoconfirm=True)
+    user.set_role(Roles.user)
     db.session.commit()
+    yield
+    delete_user(user)
+    db.session.commit()
+
+
+@pytest.fixture
+def setup_admin_user(client):
+    data = {
+        "username": "test adminuser",
+        "email": "admin@test.com",
+        "password": "Testpassword@2",
+    }
+    user = create_user(data, autoconfirm=True)
+    user.set_role(Roles.superadmin)
+    db.session.commit()
+    yield
+    # delete_user(user)
+    # db.session.commit()
 
 
 @pytest.fixture
 def teardown_user(client):
     yield
     User.query.delete()
+    db.session.execute("DELETE FROM casbin_rule")
     db.session.commit()

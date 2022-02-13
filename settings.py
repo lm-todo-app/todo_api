@@ -33,7 +33,7 @@ if ENVIRONMENT == "production":
 
 if ENVIRONMENT == "development":
     # DB_URI = "sqlite:////tmp/todo_dev.db"
-    DB_URI = "postgresql://docker:docker@localhost:5432/todo"
+    DB_URI = "postgresql://docker:docker@localhost:5433/todo"
 
 elif ENVIRONMENT == "production":
     DB_URI = os.environ["todo_api_db_uri"]
