@@ -31,6 +31,7 @@ flask-caching = "*"
 redis = "*"
 casbin = "*"
 casbin-sqlalchemy-adapter = "*"
+inflection = "*"
 
 [requires]
 python_version = "3.8"

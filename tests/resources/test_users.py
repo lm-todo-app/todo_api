@@ -242,3 +242,7 @@ class TestUserPermissions:
         }
         response = client.put(f"{USERS_URL}/1", json=data)
         assert response.status_code == 403
+
+    def test_get_users(self, client, login):
+        response = client.get(USERS_URL)
+        assert response.status_code == 403

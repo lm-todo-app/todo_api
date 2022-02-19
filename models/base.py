@@ -3,12 +3,16 @@ Base model and schema.
 """
 from database import ma
 from common.response import fail
+from common.case import camelcase
 
 
 class BaseSchema(ma.SQLAlchemyAutoSchema):
     """
     Schema that uses camel-case for its external representation
     and snake-case for its internal representation.
+
+    Data in pre_load and post_dump methods for schemas that inherit from this
+    class will have camel-case field names.
     """
 
     def on_bind_field(self, field_name, field_obj):
@@ -21,10 +25,5 @@ class BaseSchema(ma.SQLAlchemyAutoSchema):
             fail(400, data=message)
         return form
 
-
-def camelcase(s):
-    """
-    Convert snake case to camel case.
-    """
-    parts = iter(s.split("_"))
-    return next(parts) + "".join(i.title() for i in parts)
+    def field_names(self):
+        return self._declared_fields.keys()

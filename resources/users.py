@@ -13,6 +13,7 @@ from models.user import (
 from database import commit_to_db
 from authz import has_access, Objects, Actions, Roles
 from common.response import success, error
+from common.pagination import get_pagination_args, get_sort_by
 from apidocs import users as spec
 from cache import cache, resource_cache
 
@@ -25,14 +26,20 @@ class UsersResource(Resource):
     """
 
     @jwt_required()
-    @has_access(Objects.users, Actions.read)
+    @has_access(Objects.users, Actions.protected)
     @swag_from(spec.users_get)
     @cache.cached(timeout=50)
     def get(self):
         """
         Get all users.
         """
-        users = User.query.all()
+        page, size = get_pagination_args()
+        sort = get_sort_by()
+        users = (
+            User.query.order_by(sort)
+            .paginate(page=page, per_page=size)
+            .items
+        )
         return success(jsonify_users(users))
 
     @swag_from(spec.users_post)

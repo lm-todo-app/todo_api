@@ -21,16 +21,15 @@ class Objects:
 class Actions:
     read = "read"
     write = "write"
+    protected = "protected" # Admin only
 
 
 POLICIES = [
-    # We Need to include one policy for superadmin to allow them to have access
-    # to all policies by default.
     [Roles.superadmin, Objects.users, Actions.read],
     [Roles.superadmin, Objects.users, Actions.write],
+    [Roles.superadmin, Objects.users, Actions.protected],
 
     [Roles.user, Objects.users, Actions.read],
-    # [Roles.user, Objects.users, Actions.write],
 ]
 
 
