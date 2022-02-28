@@ -9,6 +9,7 @@ from tests.fixtures.user import (
 )
 from tests.fixtures.url import USERS_URL, CONFIRM_URL, LOGIN_URL, TOKEN_URL
 
+
 @pytest.mark.usefixtures("teardown_user")
 def test_create_user(client):
     data = {

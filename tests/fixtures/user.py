@@ -1,6 +1,6 @@
 import pytest
 from database import db
-from models.user import User, create_user, delete_user
+from models.user import User
 from authz import Roles
 from tests.fixtures.url import LOGIN_URL
 
@@ -26,11 +26,11 @@ def setup_user(client):
         "email": "mail@test.com",
         "password": "Testpassword@1",
     }
-    user = create_user(data, autoconfirm=True)
+    user = User().create(data, autoconfirm=True)
     user.set_role(Roles.user)
     db.session.commit()
     yield
-    delete_user(user)
+    user.delete()
     db.session.commit()
 
 
@@ -41,12 +41,10 @@ def setup_admin_user(client):
         "email": "admin@test.com",
         "password": "Testpassword@2",
     }
-    user = create_user(data, autoconfirm=True)
+    user = User.create(data, autoconfirm=True)
     user.set_role(Roles.superadmin)
     db.session.commit()
     yield
-    # delete_user(user)
-    # db.session.commit()
 
 
 @pytest.fixture

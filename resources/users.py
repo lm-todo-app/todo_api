@@ -2,22 +2,13 @@ from flask import request, jsonify
 from flasgger import swag_from
 from flask_restful import Resource
 from flask_jwt_extended import jwt_required, get_jwt_identity, unset_jwt_cookies
-from models.user import (
-    User,
-    UserSchema,
-    create_user,
-    delete_user,
-    update_user,
-    jsonify_users,
-)
+from models.user import User, UserSchema, jsonify_users
 from database import commit_to_db
 from authz import has_access, Objects, Actions, Roles
-from common.response import success, error
+from common.response import success, error, fail
 from common.pagination import get_pagination_args, get_sort_by
 from apidocs import users as spec
 from cache import cache, resource_cache
-
-USER_NOT_FOUND = {"status": "fail", "data": {"Not Found": "User does not exist"}}
 
 
 class UsersResource(Resource):
@@ -35,11 +26,9 @@ class UsersResource(Resource):
         """
         page, size = get_pagination_args()
         sort = get_sort_by()
-        users = (
-            User.query.order_by(sort)
-            .paginate(page=page, per_page=size)
-            .items
-        )
+        users = User.get_many(sort, page, size)
+        if not users:
+            fail(404, {"status": "fail", "data": {"Not Found": "No users found."}})
         return success(jsonify_users(users))
 
     @swag_from(spec.users_post)
@@ -50,7 +39,7 @@ class UsersResource(Resource):
         will need this check. If this is successful then create the user.
         """
         form = UserSchema().validate_or_400(request.get_json())
-        user = create_user(form)
+        user = User.create(form)
         user.set_role(Roles.user)
         if commit_to_db():
             user.send_confirmation_email()
@@ -127,23 +116,23 @@ class CurrentUserResource(Resource):
 
 
 def _get_user(user_id):
-    user = User.query.get_or_404(user_id, USER_NOT_FOUND)
+    user = User.get(user_id)
     return success(user.json())
 
 
 def _update_user(user_id):
     form = UserSchema().validate_or_400(request.get_json())
-    user = User.query.get_or_404(user_id, USER_NOT_FOUND)
-    user = update_user(user, form)
+    user = User.get(user_id)
+    user = user.update(form)
     if commit_to_db():
         return success(user.json())
     error(500, {"user": "Error updating user"})
 
 
 def _delete_user(user_id):
-    user = User.query.get_or_404(user_id, USER_NOT_FOUND)
+    user = User.get(user_id)
     caller_id = get_jwt_identity()
-    delete_user(user)
+    user.delete()
     if commit_to_db():
         resp = jsonify(success())
         # If the user deletes their account then this removes the users

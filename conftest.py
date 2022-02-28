@@ -10,9 +10,9 @@ import settings
 settings.DB_URI = settings.TEST_DB_URI
 settings.USE_CACHE = False
 
-from app import app # pylint: disable=wrong-import-position
-from database import db # pylint: disable=wrong-import-position
-import authz # pylint: disable=wrong-import-position
+from app import app  # pylint: disable=wrong-import-position
+from database import db  # pylint: disable=wrong-import-position
+import authz  # pylint: disable=wrong-import-position
 
 
 @pytest.fixture

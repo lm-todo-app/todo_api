@@ -1,7 +1,7 @@
 from getpass import getpass
 import click
 from flask.cli import AppGroup
-from models.user import create_user
+from models.user import User
 from database import commit_to_db
 from authz import Roles
 
@@ -44,7 +44,7 @@ def _create_user(role):
         print("\nPassword does not match!\n")
         return
 
-    user = create_user(form, autoconfirm=True)
+    user = User.create(form, autoconfirm=True)
     user.set_role(role)
 
     if commit_to_db():

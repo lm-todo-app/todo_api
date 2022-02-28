@@ -3,6 +3,7 @@ Generates and checks a hashed string to determine if the user has confirmed
 their email.
 """
 from itsdangerous import URLSafeTimedSerializer
+from itsdangerous.exc import SignatureExpired, BadSignature
 from services.sendgrid import Message
 from settings import APP_URL, API_URL, SALT, SECRET
 
@@ -23,7 +24,7 @@ def confirm_token(token, expiration=3600):
     serializer = URLSafeTimedSerializer(SECRET)
     try:
         email = serializer.loads(token, salt=SALT, max_age=expiration)
-    except:
+    except (SignatureExpired, BadSignature):
         return None
     return email
 

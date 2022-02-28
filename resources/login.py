@@ -53,12 +53,9 @@ class ConfirmEmail(Resource):
         if email is None:
             fail(401, {"form": "Account with this email address does not exist"})
         user = User.query.filter_by(email=email).first_or_404()
-        if not user:
-            fail(404, {"user": "User not found"})
         if user.confirmed_on:
             fail(400, {"form": "Account already confirmed. Please login."})
-        user.confirmed_on = datetime.now()
-        db.session.add(user)
+        user.save_email_confirmation()
         if commit_to_db():
             return success({"confirm": "You have confirmed your account."})
         error(500, {"user": "Error confirming user account"})

@@ -65,6 +65,67 @@ class User(db.Model):
     def has_permission(self, obj, act):
         return e.enforce(self.email, obj, act)
 
+    def save_email_confirmation(self):
+        self.confirmed_on = datetime.now()
+        db.session.add(self)
+
+    def delete(self):
+        # TODO: Remove from authz table
+        db.session.delete(self)
+
+    def update(self, form):
+        """
+        check that each field is in the response, if they aren't then they don't
+        need to be updated.
+
+        Also check that the username and email that the user wants to update
+        to are not already in use by another user and will throw an error if
+        they are.
+        """
+        username = form.get("username")
+        if username and self.username != username:
+            _unique_username_or_409(username)
+            self.username = username
+        email = form.get("email")
+        if email and self.email != email:
+            _unique_email_or_409(email)
+            self.email = email
+            # TODO: If email has changed update role table
+        password = form.get("password")
+        if password:
+            _strong_password_or_400(password)
+            self.set_password(password)
+        return self
+
+    @staticmethod
+    def create(form, autoconfirm=False):
+        """
+        We need to exclude the password from the request as it needs to be
+        hashed before being saved to the database. We exclude it from the
+        marshmallow loads which creates the user model object and then add the
+        hashed password to the user object.
+
+        Autoconfirm True allows users created from the cli to skip confirmation
+        email.
+        """
+        _validate_create_user_form(form)
+        password = form.pop("password")
+        user = UserSchema().load(form, session=db.session)
+        user.set_password(password)
+        if autoconfirm:
+            user.confirmed_on = datetime.now()
+        db.session.add(user)
+        return user
+
+    @classmethod
+    def get_many(cls, sort, page, size):
+        return cls.query.order_by(sort).paginate(page=page, per_page=size).items
+
+    @classmethod
+    def get(cls, user_id):
+        msg = {"status": "fail", "data": {"Not Found": "User does not exist"}}
+        return cls.query.get_or_404(user_id, msg)
+
 
 class UserSchema(BaseSchema):
     """
@@ -97,31 +158,6 @@ def jsonify_users(users):
     return [user.json() for user in users]
 
 
-def delete_user(user):
-    # TODO: Remove from authz table
-    db.session.delete(user)
-
-
-def create_user(form, autoconfirm=False):
-    """
-    We need to exclude the password from the request as it needs to be
-    hashed before being saved to the database. We exclude it from the
-    marshmallow loads which creates the user model object and then add the
-    hashed password to the user object.
-
-    Autoconfirm True allows users created from the cli to skip confirmation
-    email.
-    """
-    _validate_create_user_form(form)
-    password = form.pop("password")
-    user = UserSchema().load(form, session=db.session)
-    user.set_password(password)
-    if autoconfirm:
-        user.confirmed_on = datetime.now()
-    db.session.add(user)
-    return user
-
-
 def _validate_create_user_form(form):
     """
     Password is required here but is not required by marshmallow because
@@ -135,31 +171,6 @@ def _validate_create_user_form(form):
     _unique_email_or_409(form["email"])
     _unique_username_or_409(form["username"])
     _strong_password_or_400(form["password"])
-
-
-def update_user(user, form):
-    """
-    check that each field is in the response, if they aren't then they don't
-    need to be updated.
-
-    Also check that the username and email that the user wants to update
-    to are not already in use by another user and will throw an error if
-    they are.
-    """
-    username = form.get("username")
-    if username and user.username != username:
-        _unique_username_or_409(username)
-        user.username = username
-    email = form.get("email")
-    if email and user.email != email:
-        _unique_email_or_409(email)
-        user.email = email
-        # TODO: If email has changed update role table
-    password = form.get("password")
-    if password:
-        _strong_password_or_400(password)
-        user.set_password(password)
-    return user
 
 
 def _unique_email_or_409(email):
