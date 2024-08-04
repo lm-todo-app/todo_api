@@ -1,5 +1,6 @@
 import json
 from flask import Flask
+from werkzeug.exceptions import HTTPException
 from flask_restful import Api
 from flask_jwt_extended import JWTManager
 from flask_migrate import Migrate
@@ -34,7 +35,7 @@ app.config["JWT_COOKIE_CSRF_PROTECT"] = True
 app.config["JWT_REFRESH_COOKIE_PATH"] = f"{v1}/token/refresh"
 app.config["SQLALCHEMY_DATABASE_URI"] = DB_URI
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-app.config['SECURITY_PASSWORD_SALT'] = SALT
+app.config["SECURITY_PASSWORD_SALT"] = SALT
 
 with app.app_context():
     db.init_app(app)
@@ -53,6 +54,8 @@ api.add_resource(token.Refresh, f"{v1}/token/refresh")
 api.add_resource(token.Remove, f"{v1}/token/remove")
 api.add_resource(login.ConfirmEmail, f"{v1}/confirm/<conf_token>")
 
+authz.init()
+
 
 @app.errorhandler(HTTPException)
 def handle_exception(e):
@@ -62,15 +65,14 @@ def handle_exception(e):
     # replace the body with JSON
     response.data = json.dumps(
         {
-            "status": "fail",
-            "data": {e.name: e.description},
+            "code": e.code,
+            "name": e.name,
+            "description": e.description,
         }
     )
     response.content_type = "application/json"
     return response
 
-# Add authz policies to database
-authz.init()
 
 if __name__ == "__main__":
     app.run(debug=True)
